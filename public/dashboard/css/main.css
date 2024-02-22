@@ -1,0 +1,106 @@
+body,
+#wrapper #content-wrapper {
+  background-color: #f0ebf8;
+}
+
+.topbar {
+  height: 3.375rem;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    width: 11rem !important;
+  }
+}
+.form-editor .head-buttons {
+  gap: 5px;
+}
+
+.w-fit-content {
+  width: fit-content;
+}
+
+.container,
+.container-fluid,
+.container-lg,
+.container-md,
+.container-sm,
+.container-xl {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.draggable-icon {
+  text-align: center;
+  color: rgba(128, 128, 128, 0.5215686275);
+  cursor: move;
+}
+
+.form-editor .form-container {
+  border-top: 17px solid #4e73df;
+  border-radius: 10px;
+  margin-top: 1rem;
+  padding-bottom: 17px;
+  width: 80%;
+  margin: 1rem auto;
+}
+.form-editor .form-container .form-content .form-details,
+.form-editor .form-container .form-content .form-fields > div {
+  border-radius: 10px;
+  box-shadow: 0px 3px 5px #c8d2ef;
+  margin-bottom: 15px;
+  background-color: #fff;
+  padding: 15px 15px 5px 15px;
+}
+.form-editor .form-container .form-content .form-details:focus-within, .form-editor .form-container .form-content .form-details:focus, .form-editor .form-container .form-content .form-details:focus-visible,
+.form-editor .form-container .form-content .form-fields > div:focus-within,
+.form-editor .form-container .form-content .form-fields > div:focus,
+.form-editor .form-container .form-content .form-fields > div:focus-visible {
+  border-left: 15px solid #4e73df;
+  transition: 0.1s ease-in-out;
+}
+.form-editor .form-container .form-content .form-details:focus-within .form-details, .form-editor .form-container .form-content .form-details:focus .form-details, .form-editor .form-container .form-content .form-details:focus-visible .form-details,
+.form-editor .form-container .form-content .form-fields > div:focus-within .form-details,
+.form-editor .form-container .form-content .form-fields > div:focus .form-details,
+.form-editor .form-container .form-content .form-fields > div:focus-visible .form-details {
+  border-top-left-radius: 0 !important;
+}
+.form-editor .form-container .form-content .form-details .form-control,
+.form-editor .form-container .form-content .form-fields > div .form-control {
+  border-radius: 0;
+  border: 0;
+  font-weight: bold !important;
+}
+.form-editor .form-container .form-content .form-details .form-control::placeholder,
+.form-editor .form-container .form-content .form-fields > div .form-control::placeholder {
+  font-weight: normal !important;
+}
+.form-editor .form-container .form-content .form-details .form-control:focus,
+.form-editor .form-container .form-content .form-fields > div .form-control:focus {
+  box-shadow: 0px 2px 0px #4e73df;
+}
+.form-editor .form-container .form-content .form-details {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.form-editor .form-container .form-content .form-fields .form-field:focus-within .field-actions, .form-editor .form-container .form-content .form-fields .form-field:focus .field-actions, .form-editor .form-container .form-content .form-fields .form-field:focus-visible .field-actions {
+  display: flex;
+}
+.form-editor .form-container .form-content .form-fields .form-field .field-actions {
+  display: none;
+  justify-content: flex-end;
+  border-top: 1px solid rgba(78, 114, 223, 0.3215686275);
+}
+.form-editor .form-container .form-content .form-fields .form-field .field-actions .field-buttons-action {
+  font-size: 25px;
+  border-right: 1px solid rgba(78, 114, 223, 0.3215686275);
+}
+.form-editor .form-container .form-content .form-fields .form-field .field-actions .field-extra-action .field-required {
+  width: 120px;
+  margin-top: 0.5rem;
+}
+.form-editor .form-container textarea {
+  resize: none;
+}
+
+/*# sourceMappingURL=main.css.map */

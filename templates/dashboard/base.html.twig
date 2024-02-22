@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>
+			{% block title %}{% endblock %}
+			| Formulator
+		</title>
+		<link rel="icon" href="{{ asset('favicon.ico') }}">
+		<link href="{{ asset('dashboard/plugins/fontawesome/css/all.min.css') }}" rel="stylesheet">
+		<link href="{{ asset('dashboard/plugins/datatables/datatables.min.css') }}" rel="stylesheet">
+		<link href="{{ asset('plugins/bootstrap-5.0.2/css/bootstrap.min.css') }}" rel="stylesheet">
+		<link href="{{ asset('dashboard/css/style.min.css') }}" rel="stylesheet">
+		<link href="{{ asset('dashboard/css/main.css') }}" rel="stylesheet"> {% block stylesheets %}{% endblock %}
+		</head>
+		<body id="page-top">
+			<div id="wrapper">
+				{% include "./dashboard/partials/sidebar.html.twig" %}
+				<div id="content-wrapper">
+					<div id="content">
+						{% include "./dashboard/partials/header.html.twig" %}
+						<div class="container-fluid"> {% block body %}{% endblock %}
+							</div>
+						</div>
+					</div>
+				</div>
+				<script src="{{asset('dashboard/plugins/jquery/jquery-3.7.1.min.js')}}"></script>
+				<script src="{{asset('plugins/bootstrap-5.0.2/js/bootstrap.bundle.min.js')}}"></script>
+				<script src="{{asset('dashboard/plugins/jquery-easing/jquery.easing.min.js')}}"></script>
+				<script src="{{asset('dashboard/plugins/datatables/datatables.min.js')}}"></script>
+				<script src="{{asset('dashboard/js/app.min.js')}}"></script>
+				<script src="{{asset('dashboard/js/main.js')}}"></script>
+				{% block scripts %}{% endblock %}
+			</body>
+		</html>

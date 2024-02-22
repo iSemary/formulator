@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="{{asset('plugins/bootstrap-5.0.2/css/bootstrap.min.css')}}">
+		<link href="{{ asset('dashboard/plugins/fontawesome/css/all.min.css') }}" rel="stylesheet">
+		<link rel="icon" href="{{ asset('favicon.ico') }}">
+		<title>
+			{% block title %}{% endblock %}
+			| Formulator
+		</title>
+		<link/>
+		{% block stylesheets %}{% endblock %}
+	</head>
+	<body>
+		<div class="container"> {% block body %}{% endblock %}
+			{% include "./partials/footer.html.twig" %}
+		</div>
+		<script src="{{asset('dashboard/plugins/jquery/jquery-3.7.1.min.js')}}"></script>
+		<script src="{{asset('plugins/bootstrap-5.0.2/js/bootstrap.min.js')}}"></script>
+	</body>
+</html>

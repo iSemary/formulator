@@ -1,0 +1,104 @@
+{% extends './dashboard/base.html.twig' %}
+{% block title %}
+	Create Form
+{% endblock %}
+{% block body %}
+	<div class="container form-editor">
+		<div class="">
+			<div class="row">
+				<div class="col-md-8">
+					<div class="w-fit-content head-buttons d-flex justify-content-between">
+						<button class="btn btn-sm btn-primary">
+							<i class="fas fa-cog"></i>
+							Settings
+						</button>
+						<button class="btn btn-sm btn-primary">
+							<i class="fas fa-save"></i>
+							Save
+						</button>
+						<button class="btn btn-sm btn-primary">
+							<i class="fas fa-external-link-square-alt"></i>
+							Preview
+						</button>
+					</div>
+				</div>
+				<div class="col-md-4 text-right">
+					<div class="dropdown">
+						<button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+							Add Field
+						</button>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" href="#">Action</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		{# Form Content #}
+		<div class="form-container">
+			<div
+				class="form-content">
+				{# Form Details #}
+				<div class="form-details">
+					<div class="form-group">
+						<input class="form-control" name="title" value="Untitled Form" placeholder="Form Title"/>
+					</div>
+					<div class="form-group">
+						<textarea class="form-control" name="description" placeholder="Form Description"></textarea>
+					</div>
+				</div>
+				<div
+					class="form-fields">
+					{# First Example Question #}
+					<div class="form-field" data-field-id="0">
+						<div class="draggable-icon">
+							<i class="fas fa-grip-horizontal"></i>
+						</div>
+						<div class="form-group">
+							<input class="form-control" name="field_title[0]" value="Untitled Question Title" placeholder="Question Title"/>
+						</div>
+						<div class="form-group">
+							<textarea class="form-control" name="field_input[0]" placeholder="Question Input"></textarea>
+						</div>
+
+						<div class="form-group field-actions text-right">
+							<div class="field-buttons-action">
+								<button class="btn btn-sm clone-field" type="button">
+									<i class="far fa-clone"></i>
+								</button>
+								<button class="btn btn-sm delete-field" type="button">
+									<i class="far fa-trash-alt"></i>
+								</button>
+							</div>
+							<div class="field-extra-action">
+								<div class="field-required">
+									<div class="form-check form-switch">
+										<label class="form-check-label">
+											<input class="form-check-input" type="checkbox"/>Required</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-field" data-field-id="0">
+						<div class="draggable-icon">
+							<i class="fas fa-grip-horizontal"></i>
+						</div>
+						<div class="form-group">
+							<input class="form-control" name="field_title[0]" value="Untitled Question Title" placeholder="Question Title"/>
+						</div>
+						<div class="form-group">
+							<textarea class="form-control" name="field_input[0]" placeholder="Question Input"></textarea>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block scripts %}
+	<script src="{{asset('dashboard/plugins/jquery-ui-1.13.2/jquery-ui.min.js')}}"></script>
+	<script src="{{ asset('dashboard/js/pages/forms/create.js') }}"></script>
+{% endblock %}

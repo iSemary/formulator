@@ -1,0 +1,40 @@
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion toggled" id="accordionSidebar">
+	<a class="sidebar-brand d-grid align-items-center justify-content-center" href="{{ path('app_dashboard') }}">
+		<div class="sidebar-brand-icon rotate-n-15">
+			<img src="{{ asset('favicon.ico') }}" alt="logo" width="30px" height="30px"/>
+		</div>
+		<div class="sidebar-brand-text mt-2 mx-3">Formulator
+		</div>
+	</a>
+	<hr class="sidebar-divider mt-3 my-0"/>
+	<li class="nav-item active">
+		<a class="nav-link" href="{{ path('app_dashboard') }}">
+			<i class="fas fa-fw fa-tachometer-alt"></i>
+			<span>Dashboard</span>
+		</a>
+	</li>
+	<hr class="sidebar-divider"/>
+	<div class="sidebar-heading">Essentials</div>
+	<li class="nav-item">
+		<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+			<i class="far fa-fw fa-file-alt"></i>
+			<span>Forms</span>
+		</a>
+		<div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionSidebar">
+			<div class="bg-white py-2 collapse-inner rounded">
+				<a class="collapse-item" href="{{ path('app_forms') }}">All Forms</a>
+				<a class="collapse-item" href="{{ path('app_forms_create') }}">Create Form</a>
+			</div>
+		</div>
+	</li>
+	<li class="nav-item">
+		<a class="nav-link" href="/">
+			<i class="fas fa-fw fa-users"></i>
+			<span>Leads</span>
+		</a>
+	</li>
+	<hr class="sidebar-divider d-none d-md-block"/>
+	<div class="text-center d-none d-md-inline">
+		<button class="rounded-circle border-0" id="sidebarToggle"></button>
+	</div>
+</ul>
