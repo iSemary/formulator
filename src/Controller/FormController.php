@@ -22,7 +22,6 @@ class FormController extends AbstractController {
         return $this->render('dashboard/forms/edit.html.twig', []);
     }
 
-
     #[Route('forms/{id}', name: 'app_forms_show')]
     public function show($id): Response {
         return $this->render('forms/index.html.twig', []);

@@ -18,19 +18,15 @@
 									<h3 class="mb-4">Sign In</h3>
 								</div>
 							</div>
-							<form action="{{ path("app_login_check") }}" method="POST" class="signin-form">
-								<div class="form-group mb-3">
-									<label class="label" for="name">Email</label>
-									<input type="text" class="form-control" placeholder="Email" required>
-								</div>
-								<div class="form-group mb-3">
-									<label class="label" for="password">Password</label>
-									<input type="password" class="form-control" placeholder="Password" required>
-								</div>
-								<div class="form-group">
-									<button type="submit" class="form-control btn btn-primary rounded submit px-3">Sign In</button>
-								</div>
-							</form>
+							{% for flash_error in app.flashes %}
+								<div class="alert alert-danger" role="alert">{{ flash_error.0 }}</div>
+							{% endfor %}
+
+							{{ form_start(form) }}
+							{{ form_row(form.email) }}
+							{{ form_row(form.password) }}
+							{{ form_row(form.submit) }}
+							{{ form_end(form) }}
 							<p class="text-center">Not a member?
 								<a data-toggle="tab" href="{{ path('app_register') }}">Sign Up</a>
 							</p>

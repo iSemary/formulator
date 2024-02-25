@@ -18,6 +18,10 @@
 									<h3 class="mb-4">Create a new account</h3>
 								</div>
 							</div>
+							{% for flash_error in app.flashes %}
+								<div class="alert alert-danger" role="alert">{{ flash_error.0 }}</div>
+							{% endfor %}
+
 							{{ form_errors(registrationForm) }}
 							{{ form_start(registrationForm) }}
 							{{ form_row(registrationForm.full_name,{attr: {class: 'form-control'}}) }}

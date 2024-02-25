@@ -1,3 +1,5 @@
+{% set currentUser = get_current_user() %}
+
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-2 static-top shadow">
 	<button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
 		<i class="fa fa-bars"></i>
@@ -6,7 +8,9 @@
 		<div class="topbar-divider d-none d-sm-block"></div>
 		<li class="nav-item dropdown no-arrow">
 			<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				<span class="mr-2 d-none d-lg-inline text-gray-600 small">NAME</span>
+				<span class="mr-2 d-none d-lg-inline text-gray-600 small">
+				{{ currentUser ? currentUser.fullName : "-" }}
+				</span>
 			</a>
 			<div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
 				<a class="dropdown-item" href="#">
@@ -14,7 +18,7 @@
 					Settings
 				</a>
 				<div class="dropdown-divider"></div>
-				<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+				<a class="dropdown-item" href="{{ path('app_logout') }}">
 					<i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
 					Logout
 				</a>

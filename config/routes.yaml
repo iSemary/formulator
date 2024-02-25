@@ -3,3 +3,6 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+app_logout:
+    path: /logout
+    controller: Symfony\Component\Security\Http\Logout\LogoutController::logout
