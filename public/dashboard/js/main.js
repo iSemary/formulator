@@ -1,1 +1,0 @@
-new DataTable('.datatables');

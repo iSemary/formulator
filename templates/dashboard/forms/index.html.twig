@@ -17,19 +17,19 @@
 			</div>
 		</div>
 		<div class="card-body">
-			<table class="table table-bordered table-striped datatables">
-				<thead>
-					<tr>
-						<th>#</th>
-						<th>Title</th>
-						<th>Actions</th>
-					</tr>
-				</thead>
-			</table>
+			<div class="table"></div>
 		</div>
 	</div>
 {% endblock %}
 
 {% block scripts %}
-	<script src="{{ asset('dashboard/js/pages/forms.js') }}"></script>
+
+	<script src="{{ asset('dashboard/plugins/datatables/datatables.min.js') }}"></script>
+	<script src="{{ asset('bundles/datatables/js/datatables.js') }}"></script>
+	<script>
+		$(function () {
+
+$('.table').initDataTables({{ datatable_settings(datatable) }});
+});
+	</script>
 {% endblock %}

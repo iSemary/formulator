@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Form;
 use Doctrine\ORM\EntityManagerInterface;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
+use Omines\DataTablesBundle\Column\DateTimeColumn;
 use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,24 +25,28 @@ class FormController extends AbstractController {
 
     #[Route('dashboard/forms', name: 'app_forms')]
     public function index(Request $request, DataTableFactory $dataTableFactory): Response {
-        if ($request->isXmlHttpRequest()) {
-            // return forms as dataTable
-            $userId = $this->security->getUser()->getUserIdentifier();
-            $forms = $this->entityManager->getRepository(Form::class)->findByUserId($userId);
-            $table = $dataTableFactory->create()
-                ->add('id', TextColumn::class)
-                ->add('title', TextColumn::class)
-                ->add('created_at', TextColumn::class)
-                ->createAdapter(ORMAdapter::class, [
-                    'entity' => Form::class,
-                ])
-                ->handleRequest($request);
+        // return forms as dataTable
+        $userId = $this->security->getUser()->getUserIdentifier();
+        $forms = $this->entityManager->getRepository(Form::class)->findByUserId($userId);
+        $table = $dataTableFactory->create()
+            ->add('id', TextColumn::class, ['label' => "ID"])
+            ->add('title', TextColumn::class, ['label' => "Title"])
+            ->add('created_at', DateTimeColumn::class, ['label' => "Created At"])
+            ->add('actions', TextColumn::class, ['label' => "Actions", 'render' => function ($value) {
+                $buttons = sprintf('<a href="/dashboard/forms/edit/%u" class="btn btn-primary me-1">Edit</a>', $value);
+                $buttons .= sprintf('<a href="/dashboard/forms/edit/%u" class="btn btn-danger">Delete</a>', $value);
+                return $buttons;
+            }])
+            ->createAdapter(ORMAdapter::class, [
+                'entity' => Form::class,
+            ])
+            ->handleRequest($request);
 
-            if ($table->isCallback()) {
-                return $table->getResponse();
-            }
+        if ($table->isCallback()) {
+            return $table->getResponse();
         }
-        return $this->render('dashboard/forms/index.html.twig', []);
+
+        return $this->render('dashboard/forms/index.html.twig', ['datatable' => $table]);
     }
 
     #[Route('dashboard/forms/create', name: 'app_forms_create')]
