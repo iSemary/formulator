@@ -19,3 +19,35 @@ $(document).on('click', '.delete-field', function (e) {
     field.remove();
   }, 1000);
 });
+
+$('.toggle-settings').click(function (e) {
+  e.preventDefault();
+});
+
+$('.save-form').click(function (e) {
+  e.preventDefault();
+});
+
+$('.preview-form').click(function (e) {
+  e.preventDefault();
+});
+
+$('.add-element-node').click(function (e) {
+  e.preventDefault();
+  let elementType = parseInt($(this).attr('data-type'));
+  appendElement(elementType);
+});
+
+function appendElement(elementType) {
+  let element = null;
+  switch (elementType) {
+    case 1:
+      element = 'Text Element';
+      break;
+    default:
+      alert('Element not found');
+      break;
+  }
+
+  $('.form-fields').append(element);
+}

@@ -8,15 +8,15 @@
 			<div class="row">
 				<div class="col-md-8">
 					<div class="w-fit-content head-buttons d-flex justify-content-between">
-						<button class="btn btn-sm btn-primary">
+						<button class="btn btn-sm btn-primary toggle-settings">
 							<i class="fas fa-cog"></i>
 							Settings
 						</button>
-						<button class="btn btn-sm btn-primary">
+						<button class="btn btn-sm btn-primary save-form">
 							<i class="fas fa-save"></i>
 							Save
 						</button>
-						<button class="btn btn-sm btn-primary">
+						<button class="btn btn-sm btn-primary preview-form">
 							<i class="fas fa-external-link-square-alt"></i>
 							Preview
 						</button>
@@ -25,12 +25,17 @@
 				<div class="col-md-4 text-right">
 					<div class="dropdown">
 						<button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-							Add Field
+							Add Elements
 						</button>
 						<ul class="dropdown-menu">
-							<li>
-								<a class="dropdown-item" href="#">Action</a>
-							</li>
+							{% for element in elements %}
+								<li>
+									<a class="dropdown-item add-element-node" data-type="{{ element.type }}" href="#">
+										<i class="{{ element.icon }}"></i>
+										{{ element.title }}
+									</a>
+								</li>
+							{% endfor %}
 						</ul>
 					</div>
 				</div>

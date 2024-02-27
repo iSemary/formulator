@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Form;
+use App\Entity\FormElement;
 use Doctrine\ORM\EntityManagerInterface;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
@@ -17,10 +18,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class FormController extends AbstractController {
     private $entityManager;
     private $security;
+    private $formElements;
 
     public function __construct(EntityManagerInterface $entityManager, Security $security) {
         $this->entityManager = $entityManager;
         $this->security = $security;
+        $this->formElements = $this->entityManager->getRepository(FormElement::class)->findAll();
     }
 
     #[Route('dashboard/forms', name: 'app_forms')]
@@ -51,12 +54,12 @@ class FormController extends AbstractController {
 
     #[Route('dashboard/forms/create', name: 'app_forms_create')]
     public function create(): Response {
-        return $this->render('dashboard/forms/create.html.twig', []);
+        return $this->render('dashboard/forms/create.html.twig', ['elements' => $this->formElements]);
     }
 
     #[Route('dashboard/forms/edit/{id}', name: 'app_forms_edit')]
     public function edit($id): Response {
-        return $this->render('dashboard/forms/edit.html.twig', []);
+        return $this->render('dashboard/forms/edit.html.twig', ['elements' => $this->formElements]);
     }
 
     #[Route('forms/{id}', name: 'app_forms_show')]
