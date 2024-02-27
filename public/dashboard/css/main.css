@@ -134,3 +134,142 @@ body,
 .dataTables_length label {
   display: inline-flex;
 }
+
+
+.modal.left .modal-dialog,
+.modal.right .modal-dialog {
+  position: fixed;
+  margin: auto;
+  width: 60%;
+  height: 100%;
+  -webkit-transform: translate3d(0%, 0, 0);
+  -ms-transform: translate3d(0%, 0, 0);
+  -o-transform: translate3d(0%, 0, 0);
+  transform: translate3d(0%, 0, 0);
+}
+
+.modal.left .modal-content,
+.modal.right .modal-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.modal.left .modal-body,
+.modal.right .modal-body {
+  padding: 15px 15px 80px;
+}
+
+/*Left*/
+.modal.left.fade .modal-dialog {
+  left: -60%;
+  -webkit-transition: opacity 0.3s linear, left 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, left 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, left 0.3s ease-out;
+  transition: opacity 0.3s linear, left 0.3s ease-out;
+}
+
+.modal.left.fade.in .modal-dialog {
+  left: 0;
+}
+
+
+
+/*Right*/
+/* .modal.right.fade .modal-dialog {
+  right: -60%;
+  -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, right 0.3s ease-out;
+  transition: opacity 0.3s linear, right 0.3s ease-out;
+} */
+
+.modal.right.fade.in .modal-dialog {
+  right: 0;
+}
+
+
+@media (max-width: 767px) {
+
+  .modal.left .modal-dialog,
+  .modal.right .modal-dialog {
+    width: 100%;
+  }
+
+  .modal.left.fade .modal-dialog {
+    left: -100%;
+  }
+
+  .modal.right.fade .modal-dialog {
+    right: -100%;
+  }
+}
+
+.modal.right label {
+  font-size: 1.2em;
+}
+
+.modal.right .well {
+  background: #f3f7ff;
+  margin-bottom: 4px;
+  padding: 5px 10px;
+}
+
+.modal.right .modal-title {
+  font-size: 1.6em;
+  font-weight: bolder;
+}
+
+.modal.right .close {
+  font-size: 30px;
+}
+
+.modal-dialog {
+  position: fixed;
+  margin: auto;
+  width: 700px;
+  height: 100%;
+  right: 0px;
+}
+
+.modal-content {
+  height: 100%;
+}
+
+modal-dialog {
+  max-width: 90%;
+}
+
+.modal-dialog-slideout {
+  min-height: 100%;
+  margin: 0 0 0 auto;
+  background: #fff;
+}
+
+.modal.fade .modal-dialog.modal-dialog-slideout {
+  -webkit-transform: translate(100%, 0) scale(1);
+  transform: translate(100%, 0) scale(1);
+}
+
+.modal.fade.show .modal-dialog.modal-dialog-slideout {
+  -webkit-transform: translate(0, 0);
+  transform: translate(0, 0);
+  display: flex;
+  align-items: stretch;
+  -webkit-box-align: stretch;
+  height: 100%;
+}
+
+.modal.fade.show .modal-dialog.modal-dialog-slideout .modal-body {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.modal-dialog-slideout .modal-content {
+  border: 0;
+}
+
+.modal-dialog-slideout .modal-header,
+.modal-dialog-slideout .modal-footer {
+  height: 4rem;
+  display: block;
+}

@@ -67,7 +67,6 @@
 						<div class="form-group">
 							<textarea class="form-control" name="field_input[0]" placeholder="Question Input"></textarea>
 						</div>
-
 						<div class="form-group field-actions text-right">
 							<div class="field-buttons-action">
 								<button class="btn btn-sm clone-field" type="button">
@@ -87,15 +86,31 @@
 							</div>
 						</div>
 					</div>
-					<div class="form-field" data-field-id="0">
-						<div class="draggable-icon">
-							<i class="fas fa-grip-horizontal"></i>
-						</div>
+				</div>
+			</div>
+		</div>
+		{# Form Settings #}
+		<div id="formSettingsModal" class="modal right fade" tabindex="-1" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Form Settings</h4>
+						<button type="button" class="close" data-bs-dismiss="modal">&times;<span class="sr-only">Close</span>
+						</button>
+					</div>
+					<div class="modal-body">
 						<div class="form-group">
-							<input class="form-control" name="field_title[0]" value="Untitled Question Title" placeholder="Question Title"/>
+							<label for="">
+								<i class="fas fa-calendar-times"></i>
+								Exprie At</label>
+							<input type="date" class="form-control"/>
 						</div>
+
 						<div class="form-group">
-							<textarea class="form-control" name="field_input[0]" placeholder="Question Input"></textarea>
+							<label for="">
+								<i class="fas fa-directions"></i>
+								Redirect on submit</label>
+							<input type="url" class="form-control" placeholder="https://example.com/thank-you"/>
 						</div>
 					</div>
 				</div>
