@@ -11,6 +11,7 @@ use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -55,6 +56,11 @@ class FormController extends AbstractController {
     #[Route('dashboard/forms/create', name: 'app_forms_create')]
     public function create(): Response {
         return $this->render('dashboard/forms/create.html.twig', ['elements' => $this->formElements]);
+    }
+
+    #[Route('dashboard/forms/store', name: 'app_forms_store')]
+    public function store(): JsonResponse {
+        return new JsonResponse(["status" => 200]);
     }
 
     #[Route('dashboard/forms/edit/{id}', name: 'app_forms_edit')]

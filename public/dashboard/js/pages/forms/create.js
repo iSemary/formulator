@@ -46,6 +46,34 @@ $('.toggle-settings').click(function (e) {
 
 $('.save-form').click(function (e) {
   e.preventDefault();
+  let data = new FormData($('#fieldsForm')[0]);
+
+  let details = {};
+  let settings = {};
+  let fields = {};
+  for (let [key, value] of data.entries()) {
+    if (key.startsWith('detail_')) {
+      details[key] = value;
+    } else if (key.startsWith('setting_')) {
+      settings[key] = value;
+    } else if (key.startsWith('field_')) {
+      fields[key] = value;
+    } else {
+      console.error(`Invalid element key: ${key}`);
+    }
+  }
+
+  $.ajax({
+    type: 'POST',
+    url: '/dashboard/forms/store',
+    data: { details: details, fields: fields, settings: settings },
+    dataType: 'json',
+    beforeSend: function () {},
+    success: function (response) {},
+    error: function (xhr) {
+      console.error(xhr);
+    },
+  });
 });
 
 $('.preview-form').click(function (e) {
@@ -60,7 +88,7 @@ $('.add-element-node').click(function (e) {
 
 function appendElement(elementType) {
   let element = null;
-  let elementID = 0;
+  let elementID = -Math.floor(Math.random() * 999999999);
 
   switch (elementType) {
     case 1:
