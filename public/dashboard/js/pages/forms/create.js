@@ -31,12 +31,19 @@ $(document).on('click', '.clone-field', function (e) {
 
 $(document).on('click', '.delete-field', function (e) {
   let field = $(this).parents('.form-field');
-  // TODO Add SweetAlert
-
-  field.fadeOut(1000);
-  setTimeout(() => {
-    field.remove();
-  }, 1000);
+  Swal.fire({
+    title: 'Are you sure you want to delete this field?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      field.fadeOut(1000);
+      setTimeout(() => {
+        field.remove();
+      }, 1000);
+    }
+  });
 });
 
 $('.toggle-settings').click(function (e) {
@@ -63,15 +70,31 @@ $('.save-form').click(function (e) {
     }
   }
 
+  let btn = $(this);
+
   $.ajax({
     type: 'POST',
     url: '/dashboard/forms/store',
     data: { details: details, fields: fields, settings: settings },
     dataType: 'json',
-    beforeSend: function () {},
-    success: function (response) {},
+    beforeSend: function () {
+      btn.html('<i class="fas fa-spin fa-circle-notch"></i> Saving...').prop('disabled', true);
+    },
+    success: function (response) {
+      Toast.fire({
+        icon: 'success',
+        title: 'Form Saved Successfully',
+      });
+    },
     error: function (xhr) {
+      Toast.fire({
+        icon: 'error',
+        title: 'Something went wrong, Check Console!',
+      });
       console.error(xhr);
+    },
+    complete: function () {
+      btn.html('<i class="fas fa-save"></i> Save').prop('disabled', false);
     },
   });
 });

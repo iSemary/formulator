@@ -21,6 +21,9 @@ class Form {
     #[ORM\Column(length: 1024, nullable: true)]
     private ?string $description = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $hashName = null;
+
     #[ORM\Column]
     private ?int $status = null;
 
@@ -71,6 +74,16 @@ class Form {
 
     public function setStatus(int $status): static {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getHashName(): ?int {
+        return $this->hashName;
+    }
+
+    public function setHashName(string $hashName): static {
+        $this->hashName = $hashName;
 
         return $this;
     }
