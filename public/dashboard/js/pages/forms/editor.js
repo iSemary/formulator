@@ -51,20 +51,62 @@ $('.toggle-settings').click(function (e) {
   $('#formSettingsModal').modal('show');
 });
 
+function getFormDetails(id) {
+  $.ajax({
+    type: 'GET',
+    url: `/dashboard/forms/${id}`,
+    dataType: 'json',
+    beforeSend: function () {
+      $('.form-fields').html('Loading...');
+    },
+    success: function (response) {
+      $('.form-fields').html('');
+      let fields = response.form.fields;
+
+      fields.forEach((field) => {
+        appendElement(field.type, field.id, field.title, field.description, field.required);
+      });
+    },
+  });
+}
+
 $('.save-form').click(function (e) {
   e.preventDefault();
   let data = new FormData($('#fieldsForm')[0]);
 
   let details = {};
   let settings = {};
-  let fields = {};
+
+  let fields = [];
+
+  $('.form-field').each(function () {
+    let fieldID = $(this).data('field-id');
+    let field = {
+      id: fieldID,
+      title: $(this)
+        .find('input[name="field[' + fieldID + '][title]"]')
+        .val(),
+      description: $(this)
+        .find('input[name="field[' + fieldID + '][description]"]')
+        .val(),
+      type: $(this)
+        .find('input[name="field[' + fieldID + '][type]"]')
+        .val(),
+      required:
+        $(this)
+          .find('input[name="field[' + fieldID + '][required]"]')
+          .val() ?? 0,
+    };
+    fields.push(field);
+  });
+
   for (let [key, value] of data.entries()) {
     if (key.startsWith('detail_')) {
       details[key] = value;
     } else if (key.startsWith('setting_')) {
       settings[key] = value;
-    } else if (key.startsWith('field_')) {
-      fields[key] = value;
+    } else if (key.startsWith('field')) {
+      continue;
     } else {
       console.error(`Invalid element key: ${key}`);
     }
@@ -78,7 +120,9 @@ $('.save-form').click(function (e) {
     data: { details: details, fields: fields, settings: settings },
     dataType: 'json',
     beforeSend: function () {
-      btn.html('<i class="fas fa-spin fa-circle-notch"></i> Saving...').prop('disabled', true);
+      btn
+        .html('<i class="fas fa-spin fa-circle-notch"></i> Saving...')
+        .prop('disabled', true);
     },
     success: function (response) {
       Toast.fire({
@@ -106,34 +150,40 @@ $('.preview-form').click(function (e) {
 $('.add-element-node').click(function (e) {
   e.preventDefault();
   let elementType = parseInt($(this).attr('data-type'));
-  appendElement(elementType);
+  let elementID = -Math.floor(Math.random() * 999999999);
+  appendElement(elementType, elementID);
 });
 
-function appendElement(elementType) {
+function appendElement(
+  elementType,
+  elementID,
+  elementTitle = '',
+  elementDescription = '',
+  elementRequired = false
+) {
   let element = null;
-  let elementID = -Math.floor(Math.random() * 999999999);
 
   switch (elementType) {
     case 1:
-      element = prepareShortAnswerElement(elementID);
+      element = prepareShortAnswerElement(elementID, elementType);
       break;
     case 2:
-      element = prepareParagraphElement(elementID);
+      element = prepareParagraphElement(elementID, elementType);
       break;
     case 3:
-      element = prepareSingleElement(elementID);
+      element = prepareSingleElement(elementID, elementType);
       break;
     case 4:
-      element = prepareMultipleElement(elementID);
+      element = prepareMultipleElement(elementID, elementType);
       break;
     case 5:
-      element = prepareFileUploadElement(elementID);
+      element = prepareFileUploadElement(elementID, elementType);
       break;
     case 6:
-      element = prepareDateElement(elementID);
+      element = prepareDateElement(elementID, elementType);
       break;
     case 7:
-      element = prepareTimeElement(elementID);
+      element = prepareTimeElement(elementID, elementType);
       break;
     default:
       alert('Element not found');
@@ -143,98 +193,104 @@ function appendElement(elementType) {
   $('.form-fields').append(element);
 }
 
-function prepareShortAnswerElement(elementID) {
+function prepareShortAnswerElement(elementID, elementType) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field_title[${elementID}]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field_input[${elementID}]" placeholder="Question Input"/>
+      <input class="form-control" name="" placeholder="Question Input"/>
     </div>
   </div>`;
 
   return element;
 }
 
-function prepareParagraphElement(elementID) {
+function prepareParagraphElement(elementID, elementType) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field_title[${elementID}]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
     </div>
     <div class="form-group">
-      <textarea class="form-control" name="field_input[${elementID}]" placeholder="Paragraph"></textarea>
+      <textarea class="form-control" name="" placeholder="Paragraph"></textarea>
     </div>
   </div>`;
 
   return element;
 }
 
-function prepareDateElement(elementID) {
+function prepareDateElement(elementID, elementType) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field_title[${elementID}]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
     </div>
     <div class="form-group">
-      <input type="date" class="form-control" name="field_input[${elementID}]"  />
+      <input type="date" class="form-control" name=""  />
     </div>
   </div>`;
 
   return element;
 }
 
-function prepareTimeElement(elementID) {
+function prepareTimeElement(elementID, elementType) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field_title[${elementID}]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
     </div>
     <div class="form-group">
-      <input type="time" class="form-control" name="field_input[${elementID}]"  />
+      <input type="time" class="form-control" name="" value=""  />
     </div>
   </div>`;
 
   return element;
 }
 
-function prepareFileUploadElement(elementID) {
+function prepareFileUploadElement(elementID, elementType) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field_title[${elementID}]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
     </div>
     <div class="form-group">
-      <input type="file" class="form-control" name="field_input[${elementID}]"  />
+      <input type="file" class="form-control" name="" value=""  />
     </div>
   </div>`;
 
   return element;
 }
 
-function prepareMultipleElement(elementID) {
+function prepareMultipleElement(elementID, elementType) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+  <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field_title[${elementID}]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
     </div>
     <div class="form-group">
       <label>
-        <input type="text" class="form-control" name="field_title[${elementID}]" />
-        <input type="checkbox" name="field_title[${elementID}]" />
+        <input type="text" class="form-control" name="" />
+        <input type="checkbox" name="" />
       </label>
     </div>
   </div>`;
@@ -242,18 +298,19 @@ function prepareMultipleElement(elementID) {
   return element;
 }
 
-function prepareSingleElement(elementID) {
+function prepareSingleElement(elementID, elementType) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field_title[${elementID}]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
     </div>
     <div class="form-group">
       <label>
-        <input type="text" class="form-control" name="field_title[${elementID}]" />
-        <input type="radio" name="field_title[${elementID}]" />
+        <input type="text" class="form-control" name="" />
+        <input type="radio" name="" />
       </label>
     </div>
   </div>`;

@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Form;
 use App\Entity\FormElement;
+use App\Entity\FormField;
+use App\Entity\FormSetting;
 use Doctrine\ORM\EntityManagerInterface;
 use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
 use Omines\DataTablesBundle\Column\DateTimeColumn;
@@ -59,7 +61,7 @@ class FormController extends AbstractController {
 
     #[Route('dashboard/forms/create', name: 'app_forms_create')]
     public function create(): Response {
-        return $this->render('dashboard/forms/create.html.twig', ['elements' => $this->formElements]);
+        return $this->render('dashboard/forms/editor.html.twig', ['elements' => $this->formElements]);
     }
 
     #[Route('dashboard/forms/store', name: 'app_forms_store')]
@@ -75,28 +77,103 @@ class FormController extends AbstractController {
         $form->setStatus(1);
         $this->entityManager->persist($form);
         $this->entityManager->flush();
-        // TODO Save Form Fields
-        // TODO Save Form Settings
 
+        $formId = $form->getId();
+
+        // Save Form Settings
+        $requestSettings = $request->get('settings');
+        $this->saveFormSettings($formId, $requestSettings);
+        // Save Form Fields
+        $fields = $request->get('fields');
+        $this->syncFormFields($formId, $fields);
         return new JsonResponse(["status" => 200], 200);
     }
 
     #[Route('dashboard/forms/edit/{id}', name: 'app_forms_edit')]
     public function edit($id): Response {
-        return $this->render('dashboard/forms/edit.html.twig', ['elements' => $this->formElements]);
+        $form = $this->entityManager->getRepository(Form::class)->findOneById($id);
+        $form->settings = $this->prepareFormSettings($id);
+
+        return $this->render('dashboard/forms/editor.html.twig', ['elements' => $this->formElements, 'form' => $form]);
     }
 
-    #[Route('forms/{id}', name: 'app_forms_show')]
-    public function show($id): Response {
-        return $this->render('forms/index.html.twig', []);
+    #[Route('/dashboard/forms/{id}', name: 'app_forms_show')]
+    public function show($id): JsonResponse {
+        $form = $this->prepareFormForModify($id);
+        return new JsonResponse(['form' => $form], 200);
     }
 
-    public function generateUniqueHashName(): string {
+    private function syncFormFields(int $id, array $fields): void {
+        $orderNumber = 0;
+        foreach ($fields as $key => $field) {
+            $formField = new FormField();
+            $formField->setFormId($id);
+            $formField->setTitle($field['title']);
+            $formField->setDescription($field['description'] ?? "");
+            $formField->setType($field['type']);
+            $formField->setName("field_" . $key);
+            $formField->setRequired($field['required'] ? 1 : 0);
+            $formField->setOrderNumber($orderNumber);
+            $formField->setCreatedAt(now());
+            $formField->setUpdatedAt(now());
+            $this->entityManager->persist($formField);
+            $this->entityManager->flush();
+            $orderNumber++;
+        }
+    }
+
+
+    private function saveFormSettings(int $id, array $settings): void {
+        foreach ($settings as $key => $requestSetting) {
+            if (!empty($requestSetting)) {
+                $formSetting = new FormSetting();
+                $formSetting->setFormId($id);
+                $formSetting->setSettingKey($key);
+                $formSetting->setSettingValue($requestSetting);
+                $formSetting->setCreatedAt(now());
+                $formSetting->setUpdatedAt(now());
+                $this->entityManager->persist($formSetting);
+                $this->entityManager->flush();
+            }
+        }
+    }
+
+    private function generateUniqueHashName(): string {
         $hashName = Uuid::uuid4();
         $hashExists = $this->entityManager->getRepository(Form::class)->findByHashName($hashName);
         if ($hashExists) {
             $this->generateUniqueHashName();
         }
         return $hashName;
+    }
+
+    private function prepareFormForModify(int $id): array {
+        $form['details'] = $this->entityManager->getRepository(Form::class)->findOneById($id);;
+        $form['settings'] = $this->prepareFormSettings($id);
+        $form['fields'] = $this->prepareFormFields($id);
+        return $form;
+    }
+
+    private function prepareFormFields(int $id): array {
+        $formattedFields = [];
+        $fields = $this->entityManager->getRepository(FormField::class)->findByFormId($id);
+        foreach ($fields as $key => $field) {
+            $formattedFields[$key]['id'] = $field->getId();
+            $formattedFields[$key]['title'] = $field->getTitle();
+            $formattedFields[$key]['description'] = $field->getDescription();
+            $formattedFields[$key]['type'] = $field->getType();
+            $formattedFields[$key]['required'] = $field->getRequired();
+            $formattedFields[$key]['order_number'] = $field->getOrderNumber();
+        }
+        return $formattedFields;
+    }
+
+    private function prepareFormSettings(int $id): array {
+        $formattedSettings = [];
+        $settings = $this->entityManager->getRepository(FormSetting::class)->findByFormId($id);
+        foreach ($settings as $key => $setting) {
+            $formattedSettings[$setting->getSettingKey()] = $setting->getSettingValue();
+        }
+        return $formattedSettings;
     }
 }
