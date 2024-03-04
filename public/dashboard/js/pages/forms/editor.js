@@ -2,24 +2,19 @@ $(function () {
   $('.form-fields').sortable();
 });
 
-let fieldActions = `<div class="form-group field-actions text-right">
-<div class="field-buttons-action">
-  <button class="btn btn-sm clone-field" type="button">
-    <i class="far fa-clone"></i>
-  </button>
-  <button class="btn btn-sm delete-field" type="button">
-    <i class="far fa-trash-alt"></i>
-  </button>
-</div>
-<div class="field-extra-action">
-  <div class="field-required">
-    <div class="form-check form-switch">
-      <label class="form-check-label">
-        <input class="form-check-input" type="checkbox"/>Required</label>
-    </div>
-  </div>
-</div>
-</div>`;
+$(document).on('click', '.copy-form-url', function (e) {
+  e.preventDefault();
+  var $temp = $('<input>');
+  $('body').append($temp);
+  $temp.val($(this).attr('data-url')).select();
+  document.execCommand('copy');
+  $temp.remove();
+
+  Toast.fire({
+    title: 'Form link copied to clipboard!',
+    position: 'bottom',
+  });
+});
 
 $(document).on('click', '.clone-field', function (e) {
   let currentField = $(this).parents('.form-field');
@@ -64,7 +59,13 @@ function getFormDetails(id) {
       let fields = response.form.fields;
 
       fields.forEach((field) => {
-        appendElement(field.type, field.id, field.title, field.description, field.required);
+        appendElement(
+          field.type,
+          field.id,
+          field.title,
+          field.description,
+          field.required
+        );
       });
     },
   });
@@ -145,6 +146,8 @@ $('.save-form').click(function (e) {
 
 $('.preview-form').click(function (e) {
   e.preventDefault();
+  let formURL = $(this).data('url');
+  window.open(formURL, '_blank');
 });
 
 $('.add-element-node').click(function (e) {
@@ -157,33 +160,75 @@ $('.add-element-node').click(function (e) {
 function appendElement(
   elementType,
   elementID,
-  elementTitle = '',
-  elementDescription = '',
-  elementRequired = false
+  elementTitle = 'Untitled Question Title',
+  elementDescription = null,
+  elementRequired = true
 ) {
   let element = null;
 
   switch (elementType) {
     case 1:
-      element = prepareShortAnswerElement(elementID, elementType);
+      element = prepareShortAnswerElement(
+        elementID,
+        elementType,
+        elementTitle,
+        elementDescription,
+        elementRequired
+      );
       break;
     case 2:
-      element = prepareParagraphElement(elementID, elementType);
+      element = prepareParagraphElement(
+        elementID,
+        elementType,
+        elementTitle,
+        elementDescription,
+        elementRequired
+      );
       break;
     case 3:
-      element = prepareSingleElement(elementID, elementType);
+      element = prepareSingleElement(
+        elementID,
+        elementType,
+        elementTitle,
+        elementDescription,
+        elementRequired
+      );
       break;
     case 4:
-      element = prepareMultipleElement(elementID, elementType);
+      element = prepareMultipleElement(
+        elementID,
+        elementType,
+        elementTitle,
+        elementDescription,
+        elementRequired
+      );
       break;
     case 5:
-      element = prepareFileUploadElement(elementID, elementType);
+      element = prepareFileUploadElement(
+        elementID,
+        elementType,
+        elementTitle,
+        elementDescription,
+        elementRequired
+      );
       break;
     case 6:
-      element = prepareDateElement(elementID, elementType);
+      element = prepareDateElement(
+        elementID,
+        elementType,
+        elementTitle,
+        elementDescription,
+        elementRequired
+      );
       break;
     case 7:
-      element = prepareTimeElement(elementID, elementType);
+      element = prepareTimeElement(
+        elementID,
+        elementType,
+        elementTitle,
+        elementDescription,
+        elementRequired
+      );
       break;
     default:
       alert('Element not found');
@@ -193,127 +238,205 @@ function appendElement(
   $('.form-fields').append(element);
 }
 
-function prepareShortAnswerElement(elementID, elementType) {
+function prepareShortAnswerElement(
+  elementID,
+  elementType,
+  elementTitle,
+  elementDescription,
+  elementRequired
+) {
   let element = `<div class="form-field" data-field-id="${elementID}">
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="${elementTitle}" placeholder="Question Title"/>
     </div>
-    <div class="form-group">
-      <input class="form-control" name="" placeholder="Question Input"/>
+    <div class="form-group d-flex">
+      ${elementRequired ? '<span class="text-danger">*</span>' : ''}
+      <input class="ps-0 form-control" name="" disabled placeholder="Question Input"/>
     </div>
+    ${prepareFieldActions(elementID, elementRequired)}
   </div>`;
 
   return element;
 }
 
-function prepareParagraphElement(elementID, elementType) {
+function prepareParagraphElement(
+  elementID,
+  elementType,
+  elementTitle,
+  elementDescription,
+  elementRequired
+) {
   let element = `<div class="form-field" data-field-id="${elementID}">
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="${elementTitle}" placeholder="Question Title"/>
     </div>
-    <div class="form-group">
-      <textarea class="form-control" name="" placeholder="Paragraph"></textarea>
+    <div class="d-flex form-group">
+      ${elementRequired ? '<span class="text-danger">*</span>' : ''}
+      <textarea class="ps-0 form-control" name="" disabled placeholder="Paragraph"></textarea>
     </div>
+    ${prepareFieldActions(elementID, elementRequired)}
   </div>`;
 
   return element;
 }
 
-function prepareDateElement(elementID, elementType) {
+function prepareDateElement(
+  elementID,
+  elementType,
+  elementTitle,
+  elementDescription,
+  elementRequired
+) {
   let element = `<div class="form-field" data-field-id="${elementID}">
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="${elementTitle}" placeholder="Question Title"/>
     </div>
-    <div class="form-group">
-      <input type="date" class="form-control" name=""  />
+    <div class="d-flex form-group">
+      ${elementRequired ? '<span class="text-danger">*</span>' : ''}
+      <input type="date" class="ps-0 form-control" name="" disabled />
     </div>
+    ${prepareFieldActions(elementID, elementRequired)}
   </div>`;
 
   return element;
 }
 
-function prepareTimeElement(elementID, elementType) {
+function prepareTimeElement(
+  elementID,
+  elementType,
+  elementTitle,
+  elementDescription,
+  elementRequired
+) {
   let element = `<div class="form-field" data-field-id="${elementID}">
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="${elementTitle}" placeholder="Question Title"/>
     </div>
-    <div class="form-group">
-      <input type="time" class="form-control" name="" value=""  />
+    <div class="form-group d-flex">
+      ${elementRequired ? '<span class="text-danger">*</span>' : ''}
+      <input type="time" class="ps-0 form-control" name="" value=""  disabled />
     </div>
+    ${prepareFieldActions(elementID, elementRequired)}
   </div>`;
 
   return element;
 }
 
-function prepareFileUploadElement(elementID, elementType) {
+function prepareFileUploadElement(
+  elementID,
+  elementType,
+  elementTitle,
+  elementDescription,
+  elementRequired
+) {
   let element = `<div class="form-field" data-field-id="${elementID}">
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="${elementTitle}" placeholder="Question Title"/>
     </div>
-    <div class="form-group">
-      <input type="file" class="form-control" name="" value=""  />
+    <div class="form-group d-flex">
+      ${elementRequired ? '<span class="text-danger">*</span>' : ''}
+      <input type="file" class="ps-0 form-control" name="" value=""  disabled />
     </div>
+    ${prepareFieldActions(elementID, elementRequired)}
   </div>`;
 
   return element;
 }
 
-function prepareMultipleElement(elementID, elementType) {
+function prepareMultipleElement(
+  elementID,
+  elementType,
+  elementTitle,
+  elementDescription,
+  elementRequired
+) {
   let element = `<div class="form-field" data-field-id="${elementID}">
   <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="${elementTitle}" placeholder="Question Title"/>
     </div>
     <div class="form-group">
+      ${elementRequired ? '<span class="text-danger">*</span>' : ''}
       <label>
-        <input type="text" class="form-control" name="" />
+        <input type="text" class="form-control" name="" disabled />
         <input type="checkbox" name="" />
       </label>
     </div>
+    ${prepareFieldActions(elementID, elementRequired)}
   </div>`;
 
   return element;
 }
 
-function prepareSingleElement(elementID, elementType) {
+function prepareSingleElement(
+  elementID,
+  elementType,
+  elementTitle,
+  elementDescription,
+  elementRequired
+) {
   let element = `<div class="form-field" data-field-id="${elementID}">
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
     </div>
     <div class="form-group">
-      <input class="form-control" name="field[${elementID}][title]" value="Untitled Question Title" placeholder="Question Title"/>
+      <input class="form-control" name="field[${elementID}][title]" value="${elementTitle}" placeholder="Question Title"/>
     </div>
     <div class="form-group">
+    ${elementRequired ? '<span class="text-danger">*</span>' : ''}
       <label>
-        <input type="text" class="form-control" name="" />
+        <input type="text" class="form-control" name="" disabled />
         <input type="radio" name="" />
       </label>
     </div>
+    ${prepareFieldActions(elementID, elementRequired)}
   </div>`;
 
   return element;
+}
+
+function prepareFieldActions(elementID, elementRequired) {
+  return `<div class="form-group field-actions text-right">
+  <div class="field-buttons-action">
+    <button class="btn btn-sm clone-field" type="button">
+      <i class="far fa-clone"></i>
+    </button>
+    <button class="btn btn-sm delete-field" type="button">
+      <i class="far fa-trash-alt"></i>
+    </button>
+  </div>
+  <div class="field-extra-action">
+    <div class="field-required">
+      <div class="form-check form-switch">
+        <label class="form-check-label">
+          <input class="form-check-input" name="field[${elementID}][required]" 
+          type="checkbox" ${elementRequired && 'checked'} />Required</label>
+      </div>
+    </div>
+  </div>
+  </div>`;
 }

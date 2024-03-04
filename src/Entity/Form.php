@@ -78,7 +78,7 @@ class Form {
         return $this;
     }
 
-    public function getHashName(): ?int {
+    public function getHashName(): ?string {
         return $this->hashName;
     }
 

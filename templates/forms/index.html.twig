@@ -1,17 +1,46 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}$formName Form
+{% block title %}
+	{{ form.details.title }}
+	Form
 {% endblock %}
 
 {% block body %}
 	<section class="mt-5">
 		<div class="container">
 			<div class="row justify-content-center">
-				<div class="col-md-12 col-lg-10">
-					<div class="row d-md-flex">
+				<h5>{{form.details.title}}</h5>
+				<p>{{form.details.description}}</p>
+				<div class="col-md-12 col-lg-12">
+					<form action="" id="baseForm" method="POST">
+						<input
+						type="hidden" name="hash_name" value="{{ form.details.hashName }}"/>
+						{# Form Element Goes Here #}
+						{% for field in form.fields %}
+							<div class="form-group mt-3">
+								<label for="field_{{ field.id }}">
+									{{ field.title }}
+									{% if field.required %}
+										<span class="text-danger">*</span>
+										<small class="text-danger">
+											<i>Required</i></small>
+										{% endif %}
+									</label>
+									{% if field.type == 1 %}
+										<input type="text" id="field_{{ field.id }}" class="form-control" name="field_{{ field.id }}" {% if field.required %} required {% endif %}/>
+									{% elseif field.type == 2 %}
+										<textarea id="field_{{ field.id }}" rows="3" class="form-control" name="field_{{ field.id }}" {% if field.required %} required {% endif %}></textarea>
+										{% else %}
+									{% endif %}
+								</div>
+							{% endfor %}
+
+							<div class="form-group mt-3">
+								<button class="btn btn-success" type="submit">Submit</button>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
-		</div>
-	</section>
-{% endblock %}
+		</section>
+	{% endblock %}

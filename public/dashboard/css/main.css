@@ -273,3 +273,7 @@ modal-dialog {
   height: 4rem;
   display: block;
 }
+
+.form-control:disabled, .form-control[readonly] {
+  background-color: #ffffff00;
+}

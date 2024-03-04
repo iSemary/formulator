@@ -10,17 +10,21 @@
 				<div class="row">
 					<div class="col-md-8">
 						<div class="w-fit-content head-buttons d-flex justify-content-between">
+							<button class="btn btn-sm btn-success save-form">
+								<i class="fas fa-save"></i>
+								Save
+							</button>
 							<button class="btn btn-sm btn-primary toggle-settings">
 								<i class="fas fa-cog"></i>
 								Settings
 							</button>
-							<button class="btn btn-sm btn-primary save-form">
-								<i class="fas fa-save"></i>
-								Save
-							</button>
-							<button class="btn btn-sm btn-primary preview-form">
+							<button class="btn btn-sm btn-primary preview-form  {% if form is not defined %}{{ " d-none" }}{% endif %}" data-url="{% if form is defined %}{{ url("app_forms_show", {hashName: form.hashName}) }}{% endif %}">
 								<i class="fas fa-external-link-square-alt"></i>
 								Preview
+							</button>
+							<button class="btn btn-sm btn-outline-primary copy-form-url {% if form is not defined %}{{ " d-none" }}{% endif %}" data-url="{% if form is defined %}{{ url("app_forms_show", {hashName: form.hashName}) }}{% endif %}">
+								<i class="far fa-copy"></i>
+								Copy Form URL
 							</button>
 						</div>
 					</div>
@@ -53,79 +57,48 @@
 							<input class="form-control" name="detail_title" value="{{ form is defined ? form.title : "Untitled Form" }}" placeholder="Form Title"/>
 						</div>
 						<div class="form-group">
-							<textarea class="form-control" name="detail_description" value="{{ form is defined ? form.description : "" }}" placeholder="Form Description"></textarea>
-						</div>
-					</div>
-					<div class="form-fields">
-						{% if form is not defined %}
-							{# First Example Question #}
-							<div class="form-field" data-field-id="0">
-								<input name="field[0][type]" type="hidden" value="0"/>
-								<div class="draggable-icon">
-									<i class="fas fa-grip-horizontal"></i>
-								</div>
-								<div class="form-group">
-									<input class="form-control" name="field[0][title]" value="Untitled Question Title" placeholder="Question Title"/>
-								</div>
-								<div class="form-group">
-									<textarea class="form-control" name="" placeholder="Question Input"></textarea>
-								</div>
-								<div class="form-group field-actions text-right">
-									<div class="field-buttons-action">
-										<button class="btn btn-sm clone-field" type="button">
-											<i class="far fa-clone"></i>
-										</button>
-										<button class="btn btn-sm delete-field" type="button">
-											<i class="far fa-trash-alt"></i>
-										</button>
-									</div>
-									<div class="field-extra-action">
-										<div class="field-required">
-											<div class="form-check form-switch">
-												<label class="form-check-label">
-													<input class="form-check-input" type="checkbox"/>Required</label>
-											</div>
-										</div>
-									</div>
-								</div>
+							<textarea class="form-control" name="detail_description" placeholder="Form Description">{{ form is defined ? form.description : "" }}</textarea>
 							</div>
-						{% endif %}
+						</div>
+						<div class="form-fields">{#  Fields go here  #}</div>
 					</div>
 				</div>
-			</div>
-			{# Form Settings #}
-			<div id="formSettingsModal" class="modal right fade" tabindex="-1" role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h4 class="modal-title">Form Settings</h4>
-							<button type="button" class="close" data-bs-dismiss="modal">&times;<span class="sr-only">Close</span>
-							</button>
-						</div>
-						<div class="modal-body">
-							<div class="form-group">
-								<label for="">
-									<i class="fas fa-calendar-times"></i>
-									Exprie At</label>
-								<input type="date" name="setting_expire_at" value="{% if form is defined and form.settings.setting_expire_at is defined %}{{ form.settings.setting_expire_at }}{% else %}{% endif %}" class="form-control"/>
+				{# Form Settings #}
+				<div id="formSettingsModal" class="modal right fade" tabindex="-1" role="dialog">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h4 class="modal-title">Form Settings</h4>
+								<button type="button" class="close" data-bs-dismiss="modal">&times;<span class="sr-only">Close</span>
+								</button>
 							</div>
-							<div class="form-group">
-								<label for="">
-									<i class="fas fa-directions"></i>
-									Redirect on submit</label>
-								<input type="url" name="setting_redirect_to" value="{% if form is defined and form.settings.setting_redirect_to is defined %}{{ form.settings.setting_redirect_to }}{% else %}{% endif %}" class="form-control" placeholder="https://example.com/thank-you"/>
+							<div class="modal-body">
+								<div class="form-group">
+									<label for="">
+										<i class="fas fa-calendar-times"></i>
+										Exprie At</label>
+									<input type="date" name="setting_expire_at" value="{% if form is defined and form.settings.setting_expire_at is defined %}{{ form.settings.setting_expire_at }}{% else %}{% endif %}" class="form-control"/>
+								</div>
+								<div class="form-group">
+									<label for="">
+										<i class="fas fa-directions"></i>
+										Redirect on submit</label>
+									<input type="url" name="setting_redirect_to" value="{% if form is defined and form.settings.setting_redirect_to is defined %}{{ form.settings.setting_redirect_to }}{% else %}{% endif %}" class="form-control" placeholder="https://example.com/thank-you"/>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		</form>
+			</form>
+		</div>
 	</div>
-</div>{% endblock %}{% block scripts %}
-<script src="{{asset('dashboard/plugins/jquery-ui-1.13.2/jquery-ui.min.js')}}"></script>
-<script src="{{ asset('dashboard/js/pages/forms/editor.js') }}"></script>
-{% if form is defined %}
-	<script>
-		getFormDetails('{{ form.id }}')
-	</script>
-{% endif %}{% endblock %}
+{% endblock %}
+{% block scripts %}
+	<script src="{{asset('dashboard/plugins/jquery-ui-1.13.2/jquery-ui.min.js')}}"></script>
+	<script src="{{ asset('dashboard/js/pages/forms/editor.js') }}"></script>
+	{% if form is defined %}
+		<script>
+			getFormDetails('{{ form.id }}')
+		</script>
+	{% endif %}
+{% endblock %}
