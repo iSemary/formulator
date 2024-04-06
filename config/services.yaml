@@ -24,5 +24,9 @@ services:
             $security: '@security.helper'
         tags:
             - { name: twig.extension }
+    App\Service\Form\FormManager:
+        autowire: true
+    App\Service\Form\FormService:
+        autowire: true
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
