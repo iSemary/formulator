@@ -4,8 +4,7 @@
 {% endblock %}
 {% block body %}
 	<div class="container form-editor">
-		<form id="fieldsForm" method="POST">
-
+		<form id="fieldsForm" method="POST" action="{% if form is defined %}{{ path("app_forms_update", { id: form.id }) }}{% else %}{{ path("app_forms_store") }}{% endif %}">
 			<div class="">
 				<div class="row">
 					<div class="col-md-8">
@@ -58,7 +57,7 @@
 						</div>
 						<div class="form-group">
 							<textarea class="form-control" name="detail_description" placeholder="Form Description">{{ form is defined ? form.description : "" }}</textarea>
-							</div>
+						</div>
 						</div>
 						<div class="form-fields">{#  Fields go here  #}</div>
 					</div>

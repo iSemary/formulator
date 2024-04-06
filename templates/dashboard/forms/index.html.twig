@@ -26,10 +26,8 @@
 
 	<script src="{{ asset('dashboard/plugins/datatables/datatables.min.js') }}"></script>
 	<script src="{{ asset('bundles/datatables/js/datatables.js') }}"></script>
+	<script src="{{ asset('dashboard/js/pages/forms/index.js') }}"></script>
 	<script>
-		$(function () {
-
-$('.table').initDataTables({{ datatable_settings(datatable) }});
-});
+		$(function () {$('.table').initDataTables({{ datatable_settings(datatable) }});});
 	</script>
 {% endblock %}

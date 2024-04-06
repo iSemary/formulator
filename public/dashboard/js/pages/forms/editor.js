@@ -73,7 +73,10 @@ function getFormDetails(id) {
 
 $('.save-form').click(function (e) {
   e.preventDefault();
-  let data = new FormData($('#fieldsForm')[0]);
+  let form = $('#fieldsForm');
+  let formURL = form.attr('action');
+
+  let data = new FormData(form[0]);
 
   let details = {};
   let settings = {};
@@ -117,7 +120,7 @@ $('.save-form').click(function (e) {
 
   $.ajax({
     type: 'POST',
-    url: '/dashboard/forms/store',
+    url: formURL,
     data: { details: details, fields: fields, settings: settings },
     dataType: 'json',
     beforeSend: function () {

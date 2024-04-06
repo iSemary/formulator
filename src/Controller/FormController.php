@@ -6,30 +6,28 @@ use App\Entity\Form;
 use App\Entity\FormElement;
 use App\Entity\FormField;
 use App\Entity\FormSetting;
+use App\Service\FormManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Omines\DataTablesBundle\Adapter\Doctrine\ORMAdapter;
-use Omines\DataTablesBundle\Column\DateTimeColumn;
-use Omines\DataTablesBundle\Column\TextColumn;
 use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Ramsey\Uuid\Uuid;
-use Ramsey\Uuid\UuidInterface;
-use function Symfony\Component\Clock\now;
 
 class FormController extends AbstractController {
     private $entityManager;
     private $security;
     private $formElements;
+    private $formManager;
     private $userId;
 
-    public function __construct(EntityManagerInterface $entityManager, Security $security) {
+    public function __construct(EntityManagerInterface $entityManager, Security $security, FormManager $formManager) {
         $this->entityManager = $entityManager;
         $this->security = $security;
+        $this->formManager = $formManager;
         $this->formElements = $this->entityManager->getRepository(FormElement::class)->findAll();
         $this->userId = $this->security->getUser()->getUserIdentifier();
     }
@@ -37,25 +35,10 @@ class FormController extends AbstractController {
     #[Route('dashboard/forms', name: 'app_forms')]
     public function index(Request $request, DataTableFactory $dataTableFactory): Response {
         // return forms as dataTable
-        $forms = $this->entityManager->getRepository(Form::class)->findByUserId($this->userId);
-        $table = $dataTableFactory->create()
-            ->add('id', TextColumn::class, ['label' => "ID"])
-            ->add('title', TextColumn::class, ['label' => "Title"])
-            ->add('created_at', DateTimeColumn::class, ['label' => "Created At"])
-            ->add('actions', TextColumn::class, ['label' => "Actions", 'render' => function ($value, $row) {
-                $buttons = sprintf('<a href="/dashboard/forms/edit/%u" class="btn btn-primary me-1">Edit</a>', $row->getId());
-                $buttons .= sprintf('<a href="/dashboard/forms/edit/%u" class="btn btn-danger">Delete</a>', $row->getId());
-                return $buttons;
-            }])
-            ->createAdapter(ORMAdapter::class, [
-                'entity' => Form::class,
-            ])
-            ->handleRequest($request);
-
+        $table = $this->formManager->getAllForms($request, $dataTableFactory);
         if ($table->isCallback()) {
             return $table->getResponse();
         }
-
         return $this->render('dashboard/forms/index.html.twig', ['datatable' => $table]);
     }
 
@@ -76,38 +59,32 @@ class FormController extends AbstractController {
     #[Route('dashboard/forms/store', name: 'app_forms_store')]
     public function store(Request $request): JsonResponse {
         // Create Form
-        $form = new Form();
-        $form->setUserId($this->userId);
-        $form->setTitle($request->get('details')['detail_title']);
-        $form->setDescription($request->get('details')['detail_description']);
-        $form->setHashName($this->generateUniqueHashName());
-        $form->setCreatedAt(now());
-        $form->setUpdatedAt(now());
-        $form->setStatus(1);
-        $this->entityManager->persist($form);
-        $this->entityManager->flush();
-
-        $formId = $form->getId();
-
-        // Save Form Settings
-        $requestSettings = $request->get('settings');
-        $this->saveFormSettings($formId, $requestSettings);
-        // Save Form Fields
-        $fields = $request->get('fields');
-        $this->syncFormFields($formId, $fields);
+        $this->formManager->createForm($request);
         return new JsonResponse(["status" => 200], 200);
     }
 
     #[Route('dashboard/forms/edit/{id}', name: 'app_forms_edit')]
     public function edit($id): Response {
-        $form = $this->entityManager->getRepository(Form::class)->findOneById($id);
+        $form = $this->entityManager->getRepository(Form::class)->findOneByIdAndUserId($id, $this->userId);
+        if (!$form) {
+            throw new NotFoundHttpException('Form not authorized or does not exist.');
+        }
         $form->settings = $this->prepareFormSettings($id);
         return $this->render('dashboard/forms/editor.html.twig', ['elements' => $this->formElements, 'form' => $form]);
     }
 
+    #[Route('dashboard/forms/update/{id}', name: 'app_forms_update')]
+    public function update(int $id, Request $request): Response {
+        $form = $this->entityManager->getRepository(Form::class)->findOneByIdAndUserId($id, $this->userId);
+        if (!$form) {
+            throw new NotFoundHttpException('Form not authorized or does not exist.');
+        }
+        return $this->formManager->updateForm($id, $request);
+    }
+
     #[Route('/dashboard/forms/{id}', name: 'app_forms_details')]
     public function returnFormDetails($id): JsonResponse {
-        $form = $this->prepareFormForModify($id);
+        $form = $this->prepareFormForModify($id, $this->userId);
         return new JsonResponse(['form' => $form], 200);
     }
 
@@ -117,79 +94,15 @@ class FormController extends AbstractController {
         return $this->render('forms/index.html.twig', ['form' => $form]);
     }
 
-    /**
-     * The function syncFormFields takes an ID and an array of fields, creates FormField objects with the
-     * provided data, and persists them to the database with an incremental order number.
-     * 
-     * @param int id The `id` parameter in the `syncFormFields` function represents the ID of the form to
-     * which the form fields will be synced. This function takes an integer ID as the first parameter to
-     * identify the form to which the form fields will be associated.
-     * @param array fields The `syncFormFields` function takes an integer `` and an array `` as
-     * parameters. The `` array contains information about form fields such as title, description,
-     * type, required status, etc.
-     */
-    private function syncFormFields(int $id, array $fields): void {
-        $orderNumber = 0;
-        foreach ($fields as $key => $field) {
-            $formField = new FormField();
-            $formField->setFormId($id);
-            $formField->setTitle($field['title']);
-            $formField->setDescription($field['description'] ?? "");
-            $formField->setType($field['type']);
-            $formField->setName("field_" . $key);
-            $formField->setRequired($field['required'] ? 1 : 0);
-            $formField->setOrderNumber($orderNumber);
-            $formField->setCreatedAt(now());
-            $formField->setUpdatedAt(now());
-            $this->entityManager->persist($formField);
-            $this->entityManager->flush();
-            $orderNumber++;
-        }
+    #[Route('dashboard/forms/delete/{id}', name: 'app_forms_delete')]
+    public function delete($id): JsonResponse {
+        return $this->formManager->deleteForm($id);
     }
 
 
-    /**
-     * The function `saveFormSettings` saves form settings to the database based on the provided settings
-     * array.
-     * 
-     * @param int id The `id` parameter in the `saveFormSettings` function is an integer value that
-     * represents the form ID to which the settings belong. This ID is used to associate the settings with
-     * the specific form in the database.
-     * @param array settings The `saveFormSettings` function takes an integer `` and an array
-     * `` as parameters. The function iterates over the `` array, creates a new
-     * `FormSetting` object for each non-empty setting, sets the form ID, setting key, setting value,
-     * creation timestamp
-     */
-    private function saveFormSettings(int $id, array $settings): void {
-        foreach ($settings as $key => $requestSetting) {
-            if (!empty($requestSetting)) {
-                $formSetting = new FormSetting();
-                $formSetting->setFormId($id);
-                $formSetting->setSettingKey($key);
-                $formSetting->setSettingValue($requestSetting);
-                $formSetting->setCreatedAt(now());
-                $formSetting->setUpdatedAt(now());
-                $this->entityManager->persist($formSetting);
-                $this->entityManager->flush();
-            }
-        }
-    }
-
-    /**
-     * The function generates a unique hash name using UUID and recursively ensures its uniqueness in a
-     * database table.
-     * 
-     * @return string a unique hash name generated using the `Uuid::uuid4()` method. If the generated hash
-     * name already exists in the database, the function recursively calls itself to generate a new unique
-     * hash name until a unique one is found.
-     */
-    private function generateUniqueHashName(): string {
-        $hashName = Uuid::uuid4();
-        $hashExists = $this->entityManager->getRepository(Form::class)->findByHashName($hashName);
-        if ($hashExists) {
-            $this->generateUniqueHashName();
-        }
-        return $hashName;
+    #[Route('dashboard/forms/restore/{id}', name: 'app_forms_restore')]
+    public function restore($id): JsonResponse {
+        return $this->formManager->restoreForm($id);
     }
 
     /**
