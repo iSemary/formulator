@@ -13,7 +13,6 @@ class DashboardController extends AbstractController {
         $this->formService = $formService;
     }
 
-
     #[Route('/dashboard', name: 'app_dashboard')]
     public function index(): Response {
         $totalForms = $this->formService->getTotalForms();

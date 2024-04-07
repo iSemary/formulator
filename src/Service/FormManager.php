@@ -78,8 +78,15 @@ class FormManager implements FormManagerInterface {
         $form = $this->entityManager->getRepository(Form::class)->findOneByIdAndUserId($id, $this->userId);
         if ($form) {
             $this->updateFormRow($form, $request);
-            $this->updateFormSettings($form, $request);
-            $this->updateFormFields($form, $request);
+
+            $formId = $form->getId();
+            // Update Form Settings
+            $requestSettings = $request->get('settings');
+            $this->formSettingManager->update($formId, $requestSettings);
+            // Update Form Fields
+            // $fields = $request->get('fields');
+            // $this->formFieldManager->update($formId, $fields);
+
             return new JsonResponse(['success' => true], 200);
         }
         return new JsonResponse(['success' => false], 400);
@@ -165,11 +172,4 @@ class FormManager implements FormManagerInterface {
         $this->entityManager->flush();
     }
 
-    public function updateFormSettings($form, $request) {
-        return $this->formSettingManager->update($form, $request);
-    }
-
-    public function updateFormFields($form, $request) {
-        return $this->formFieldManager->update($form, $request);
-    }
 }

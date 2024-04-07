@@ -19,11 +19,19 @@ class FormFieldRepository extends ServiceEntityRepository {
         parent::__construct($registry, FormField::class);
     }
 
-
     public function findByFormId(int $formId): array {
         return $this->createQueryBuilder('fs')
             ->andWhere('fs.form_id = :formId')
             ->setParameter('formId', $formId)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByFormIdAndActive(int $formId): array {
+        return $this->createQueryBuilder('fs')
+            ->andWhere('fs.form_id = :formId')
+            ->setParameter('formId', $formId)
+            ->andWhere('fs.status = 1')
             ->getQuery()
             ->getResult();
     }

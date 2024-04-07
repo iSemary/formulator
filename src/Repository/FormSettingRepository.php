@@ -26,4 +26,14 @@ class FormSettingRepository extends ServiceEntityRepository {
             ->getQuery()
             ->getResult();
     }
+
+    public function findOneByFormIdAndKey(int $formId, string $key) {
+        return $this->createQueryBuilder('fs')
+            ->andWhere('fs.form_id = :formId')
+            ->setParameter('formId', $formId)
+            ->andWhere('fs.setting_key = :settingKey')
+            ->setParameter('settingKey', $key)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

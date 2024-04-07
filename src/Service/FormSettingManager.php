@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Form;
 use App\Entity\FormSetting;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -45,10 +44,32 @@ class FormSettingManager implements FormSettingManagerInterface {
     }
 
     public function update(int $formId, array $settings): JsonResponse {
+        foreach ($settings as $key => $setting) {
+            if (!empty($setting)) {
+                // update or create
+                $existingSetting = $this->entityManager->getRepository(FormSetting::class)->findOneByFormIdAndKey($formId, $key);
+                if ($existingSetting) {
+                    $existingSetting->setSettingValue($setting);
+                    $existingSetting->setUpdatedAt(now());
+                    $this->entityManager->persist($existingSetting);
+                    $this->entityManager->flush();
+                } else {
+                    $this->create($formId, [$key => $setting]);
+                }
+            } else {
+                // delete
+                $this->delete($formId, $key);
+            }
+        }
         return new JsonResponse(['success' => true], 200);
     }
 
-    public function delete(Form $form): JsonResponse {
+    public function delete(int $formId, string $key): JsonResponse {
+        $setting = $this->entityManager->getRepository(FormSetting::class)->findOneByFormIdAndKey($formId, $key);
+        if ($setting) {
+            $this->entityManager->remove($setting);
+            $this->entityManager->flush();
+        }
         return new JsonResponse(['success' => true], 200);
     }
 }

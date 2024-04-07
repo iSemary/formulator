@@ -33,7 +33,6 @@ class FormRepository extends ServiceEntityRepository {
             ->getOneOrNullResult();
     }
 
-
     /**
      * @return int Returns numeric number of total forms for specific user
      */
@@ -44,5 +43,14 @@ class FormRepository extends ServiceEntityRepository {
             ->setParameter('userId', $userId)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function findOneByHashNameAndActive(string $hashName) {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.hashName = :hashName')
+            ->setParameter('hashName', $hashName)
+            ->andWhere('f.status = 1')
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

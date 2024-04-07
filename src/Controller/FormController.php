@@ -99,7 +99,6 @@ class FormController extends AbstractController {
         return $this->formManager->deleteForm($id);
     }
 
-
     #[Route('dashboard/forms/restore/{id}', name: 'app_forms_restore')]
     public function restore($id): JsonResponse {
         return $this->formManager->restoreForm($id);
@@ -131,7 +130,7 @@ class FormController extends AbstractController {
      * @return array An array containing details, settings, and fields of a form is being returned.
      */
     private function prepareFormForSubmit(string $hashName): array {
-        $form['details'] = $this->entityManager->getRepository(Form::class)->findOneByHashName($hashName);
+        $form['details'] = $this->entityManager->getRepository(Form::class)->findOneByHashNameAndActive($hashName);
         $form['settings'] = $this->prepareFormSettings($form['details']->getId());
         $form['fields'] = $this->prepareFormFields($form['details']->getId());
         return $form;
@@ -152,7 +151,7 @@ class FormController extends AbstractController {
      */
     private function prepareFormFields(int $id): array {
         $formattedFields = [];
-        $fields = $this->entityManager->getRepository(FormField::class)->findByFormId($id);
+        $fields = $this->entityManager->getRepository(FormField::class)->findByFormIdAndActive($id);
         foreach ($fields as $key => $field) {
             $formattedFields[$key]['id'] = $field->getId();
             $formattedFields[$key]['title'] = $field->getTitle();
@@ -180,7 +179,7 @@ class FormController extends AbstractController {
     private function prepareFormSettings(int $id): array {
         $formattedSettings = [];
         $settings = $this->entityManager->getRepository(FormSetting::class)->findByFormId($id);
-        foreach ($settings as $key => $setting) {
+        foreach ($settings as $setting) {
             $formattedSettings[$setting->getSettingKey()] = $setting->getSettingValue();
         }
         return $formattedSettings;
