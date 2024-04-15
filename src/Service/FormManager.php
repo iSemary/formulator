@@ -84,8 +84,8 @@ class FormManager implements FormManagerInterface {
             $requestSettings = $request->get('settings');
             $this->formSettingManager->update($formId, $requestSettings);
             // Update Form Fields
-            // $fields = $request->get('fields');
-            // $this->formFieldManager->update($formId, $fields);
+            $fields = $request->get('fields');
+            $this->formFieldManager->update($formId, $fields);
 
             return new JsonResponse(['success' => true], 200);
         }

@@ -35,4 +35,14 @@ class FormFieldRepository extends ServiceEntityRepository {
             ->getQuery()
             ->getResult();
     }
+
+    public function findOneByFormIdAndId(int $formId, int $id) {
+        return $this->createQueryBuilder('ff')
+            ->andWhere('ff.form_id = :formId')
+            ->setParameter('formId', $formId)
+            ->andWhere('ff.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

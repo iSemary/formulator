@@ -26,6 +26,7 @@ $(document).on('click', '.clone-field', function (e) {
 
 $(document).on('click', '.delete-field', function (e) {
   let field = $(this).parents('.form-field');
+  let elementID = field.attr('data-field-id');
   Swal.fire({
     title: 'Are you sure you want to delete this field?',
     icon: 'warning',
@@ -34,9 +35,9 @@ $(document).on('click', '.delete-field', function (e) {
   }).then((result) => {
     if (result.isConfirmed) {
       field.fadeOut(1000);
-      setTimeout(() => {
-        field.remove();
-      }, 1000);
+      field.prepend(
+        `<input type="hidden" name="field[${elementID}][deleted]" value="1" />`
+      );
     }
   });
 });
@@ -99,6 +100,10 @@ $('.save-form').click(function (e) {
       required:
         $(this)
           .find('input[name="field[' + fieldID + '][required]"]')
+          .val() ?? 0,
+      deleted:
+        $(this)
+          .find('input[name="field[' + fieldID + '][deleted]"]')
           .val() ?? 0,
     };
     fields.push(field);
@@ -249,6 +254,7 @@ function prepareShortAnswerElement(
   elementRequired
 ) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][id]" type="hidden" value="${elementID}" />
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
@@ -274,6 +280,7 @@ function prepareParagraphElement(
   elementRequired
 ) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][id]" type="hidden" value="${elementID}" />
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
@@ -299,6 +306,7 @@ function prepareDateElement(
   elementRequired
 ) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][id]" type="hidden" value="${elementID}" />
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
@@ -324,6 +332,7 @@ function prepareTimeElement(
   elementRequired
 ) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][id]" type="hidden" value="${elementID}" />
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
@@ -349,6 +358,7 @@ function prepareFileUploadElement(
   elementRequired
 ) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][id]" type="hidden" value="${elementID}" />
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
@@ -374,6 +384,7 @@ function prepareMultipleElement(
   elementRequired
 ) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+  <input name="field[${elementID}][id]" type="hidden" value="${elementID}" />
   <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>
@@ -402,6 +413,7 @@ function prepareSingleElement(
   elementRequired
 ) {
   let element = `<div class="form-field" data-field-id="${elementID}">
+    <input name="field[${elementID}][id]" type="hidden" value="${elementID}" />
     <input name="field[${elementID}][type]" type="hidden" value="${elementType}" />
     <div class="draggable-icon">
       <i class="fas fa-grip-horizontal"></i>

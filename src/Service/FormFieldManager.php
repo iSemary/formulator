@@ -16,8 +16,7 @@ class FormFieldManager implements FormFieldManagerInterface {
         $this->entityManager = $entityManager;
     }
 
-    public function create(int $formId, array $fields): JsonResponse {
-        $orderNumber = 0;
+    public function create(int $formId, array $fields, int $orderNumber = 0): JsonResponse {
         foreach ($fields as $key => $field) {
             $formField = new FormField();
             $formField->setFormId($formId);
@@ -38,12 +37,33 @@ class FormFieldManager implements FormFieldManagerInterface {
     }
 
     public function update(int $formId, array $fields): JsonResponse {
-
+        $orderNumber = 0;
+        foreach ($fields as $key => $field) {
+            if (!$field['deleted']) {
+                // update or create fields
+                $existingField = $this->entityManager->getRepository(FormField::class)->findOneByFormIdAndId($formId, $field['id']);
+                if ($existingField) {
+                    $existingField->setTitle($field['title']);
+                    $existingField->setDescription($field['description'] ?? "");
+                    $existingField->setRequired($field['required'] ? 1 : 0);
+                    $existingField->setOrderNumber($orderNumber);
+                    $existingField->setUpdatedAt(now());
+                    $this->entityManager->persist($existingField);
+                    $this->entityManager->flush();
+                } else {
+                    $this->create($formId, [$field], $orderNumber);
+                }
+                $orderNumber++;
+            } else {
+                // delete fields
+                $this->delete($formId, $field['id']);
+            }
+        }
         return new JsonResponse(['success' => true], 200);
     }
 
     public function delete(int $formId, int $fieldId): JsonResponse {
-        $formField = $this->entityManager->getRepository(Form::class)->findOneById($fieldId);
+        $formField = $this->entityManager->getRepository(FormField::class)->findOneById($fieldId);
         if ($formField) {
             $formField->setStatus(0);
             $this->entityManager->persist($formField);
