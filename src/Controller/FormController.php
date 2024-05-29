@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\FieldOption;
 use App\Entity\Form;
 use App\Entity\FormElement;
 use App\Entity\FormField;
@@ -159,6 +160,7 @@ class FormController extends AbstractController {
             $formattedFields[$key]['type'] = $field->getType();
             $formattedFields[$key]['required'] = $field->getRequired();
             $formattedFields[$key]['order_number'] = $field->getOrderNumber();
+            $formattedFields[$key]['options'] = $this->getFieldOptions($field->getId());
         }
         return $formattedFields;
     }
@@ -183,5 +185,10 @@ class FormController extends AbstractController {
             $formattedSettings[$setting->getSettingKey()] = $setting->getSettingValue();
         }
         return $formattedSettings;
+    }
+
+    private function getFieldOptions(int $fieldId): array {
+        $options = $this->entityManager->getRepository(FieldOption::class)->findAllByFieldIdAsArray($fieldId);
+        return $options;
     }
 }

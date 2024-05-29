@@ -65,7 +65,8 @@ function getFormDetails(id) {
           field.id,
           field.title,
           field.description,
-          field.required
+          field.required,
+          field.options ?? []
         );
       });
     },
@@ -86,6 +87,14 @@ $('.save-form').click(function (e) {
 
   $('.form-field').each(function () {
     let fieldID = $(this).data('field-id');
+
+    let options = [];
+    $(this)
+      .find('.field-option-container input[type=text]')
+      .each(function (index, element) {
+        options.push($(element).val());
+      });
+
     let field = {
       id: fieldID,
       title: $(this)
@@ -105,6 +114,7 @@ $('.save-form').click(function (e) {
         $(this)
           .find('input[name="field[' + fieldID + '][deleted]"]')
           .val() ?? 0,
+      options: options,
     };
     fields.push(field);
   });
@@ -138,6 +148,9 @@ $('.save-form').click(function (e) {
         icon: 'success',
         title: 'Form Saved Successfully',
       });
+
+      // TODO if create form then redirect to edit page
+      // Else reload fields with new ids
     },
     error: function (xhr) {
       Toast.fire({
@@ -170,7 +183,8 @@ function appendElement(
   elementID,
   elementTitle = 'Untitled Question Title',
   elementDescription = null,
-  elementRequired = true
+  elementRequired = true,
+  elementOptions = ['First Option', 'Second Option', 'Third Option']
 ) {
   let element = null;
 
@@ -199,7 +213,8 @@ function appendElement(
         elementType,
         elementTitle,
         elementDescription,
-        elementRequired
+        elementRequired,
+        elementOptions
       );
       break;
     case 4:
@@ -208,7 +223,8 @@ function appendElement(
         elementType,
         elementTitle,
         elementDescription,
-        elementRequired
+        elementRequired,
+        elementOptions
       );
       break;
     case 5:
@@ -381,7 +397,8 @@ function prepareMultipleElement(
   elementType,
   elementTitle,
   elementDescription,
-  elementRequired
+  elementRequired,
+  elementOptions
 ) {
   let element = `<div class="form-field" data-field-id="${elementID}">
   <input name="field[${elementID}][id]" type="hidden" value="${elementID}" />
@@ -394,10 +411,12 @@ function prepareMultipleElement(
     </div>
     <div class="form-group">
       ${elementRequired ? '<span class="text-danger">*</span>' : ''}
-      <label>
-        <input type="text" class="form-control" name="" disabled />
-        <input type="checkbox" name="" />
-      </label>
+      <div class="options">
+        ${prepareFieldOptions(elementID, elementOptions, 'checkbox')}
+      </div>
+      <div class="text-right">
+        <button class="btn btn-sm btn-primary add-field-option" data-field-id="${elementID}" type="button">Add New Option</button>
+      </div>
     </div>
     ${prepareFieldActions(elementID, elementRequired)}
   </div>`;
@@ -410,7 +429,8 @@ function prepareSingleElement(
   elementType,
   elementTitle,
   elementDescription,
-  elementRequired
+  elementRequired,
+  elementOptions
 ) {
   let element = `<div class="form-field" data-field-id="${elementID}">
     <input name="field[${elementID}][id]" type="hidden" value="${elementID}" />
@@ -423,11 +443,13 @@ function prepareSingleElement(
     </div>
     <div class="form-group">
     ${elementRequired ? '<span class="text-danger">*</span>' : ''}
-      <label>
-        <input type="text" class="form-control" name="" disabled />
-        <input type="radio" name="" />
-      </label>
-    </div>
+      <div class="options">
+        ${prepareFieldOptions(elementID, elementOptions, 'radio')}
+      </div>
+      <div class="text-right">
+        <button class="btn btn-sm btn-primary add-field-option" data-field-id="${elementID}" type="button">Add New Option</button>
+      </div>
+      </div>
     ${prepareFieldActions(elementID, elementRequired)}
   </div>`;
 
@@ -455,3 +477,45 @@ function prepareFieldActions(elementID, elementRequired) {
   </div>
   </div>`;
 }
+
+function prepareFieldOptions(elementID, elementOptions, optionType) {
+  let fieldOptions = '';
+
+  $.each(elementOptions, function (i, elementOption) {
+    fieldOptions += `<label class="field-option-container d-flex">
+       <input type="${optionType}" name="field[${elementID}][option][${i}]" />
+       <input type="text" class="form-control" name="" value="${elementOption}" />
+       ${
+         i > 0
+           ? `<button class="btn btn-sm btn-danger delete-field-option" type="button"><i class="fa fa-trash"></i></button>`
+           : ''
+       }
+    </label>`;
+  });
+
+  return fieldOptions;
+}
+
+$(document).on('click', '.delete-field-option', function (e) {
+  $(this).parents('.field-option-container').remove();
+});
+
+$(document).on('click', '.add-field-option', function (e) {
+  let $this = $(this);
+  let elementID = $this.attr('data-field-id');
+  let $formField = $this.parents('.form-field');
+  let $optionsContainer = $formField.find('.options');
+
+  let optionType = $formField.find('.field-option-container input[type=radio]')
+    .length
+    ? 'radio'
+    : 'checkbox';
+
+  let i = $optionsContainer.find('.field-option-container').length;
+
+  $optionsContainer.append(`<label class="field-option-container d-flex">
+    <input type="${optionType}" name="field[${elementID}][option][${i}]" />
+    <input type="text" class="form-control" name="" value="" />
+    <button class="btn btn-sm btn-danger delete-field-option" type="button"><i class="fa fa-trash"></i></button>
+  </label>`);
+});
