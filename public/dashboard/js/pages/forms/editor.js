@@ -114,7 +114,9 @@ $('.save-form').click(function (e) {
         .val(),
       required: $(this)
         .find('input[name="field[' + fieldID + '][required]"]')
-        .is(':checked') ? 1 : 0,
+        .is(':checked')
+        ? 1
+        : 0,
       deleted:
         $(this)
           .find('input[name="field[' + fieldID + '][deleted]"]')
@@ -154,8 +156,13 @@ $('.save-form').click(function (e) {
         title: 'Form Saved Successfully',
       });
 
-      // TODO if create form then redirect to edit page
+      // if create form then redirect to edit page
       // Else reload fields with new ids
+      if (response.status == 201) {
+        window.location.href = 'edit/' + response.id;
+      } else {
+        getFormDetails(response.id);
+      }
     },
     error: function (xhr) {
       Toast.fire({

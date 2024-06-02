@@ -14,6 +14,7 @@ use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -63,8 +64,8 @@ class FormController extends AbstractController {
     #[Route('dashboard/forms/store', name: 'app_forms_store')]
     public function store(Request $request): JsonResponse {
         // Create Form
-        $this->formManager->createForm($request);
-        return new JsonResponse(["status" => 200], 200);
+        $form = $this->formManager->createForm($request);
+        return new JsonResponse(["status" => 201, 'id' => $form->getId()], 200);
     }
 
     #[Route('dashboard/forms/edit/{id}', name: 'app_forms_edit')]
@@ -83,17 +84,19 @@ class FormController extends AbstractController {
         if (!$form) {
             throw new NotFoundHttpException('Form not authorized or does not exist.');
         }
-        return $this->formManager->updateForm($id, $request);
+        $this->formManager->updateForm($id, $request);
+
+        return new JsonResponse(["status" => 200, 'id' => $id], 200);
     }
 
     #[Route('/dashboard/forms/{id}', name: 'app_forms_details')]
-    public function returnFormDetails($id): JsonResponse {
+    public function returnFormDetails(int $id): JsonResponse {
         $form = $this->prepareFormForModify($id, $this->userId);
         return new JsonResponse(['form' => $form], 200);
     }
 
     #[Route('/forms/{hashName}', name: 'app_forms_show')]
-    public function show($hashName) {
+    public function show(string $hashName) {
         $form = $this->prepareFormForSubmit($hashName);
         return $this->render('forms/index.html.twig', ['form' => $form]);
     }
@@ -104,10 +107,11 @@ class FormController extends AbstractController {
         if (!$form) {
             throw new NotFoundHttpException('Form not authorized or does not exist.');
         }
+        // Submit the form
+        $this->formSubmission->submit($hashName, $request);
 
-        $result = $this->formSubmission->submit($hashName, $request);
-
-        return $this->render('forms/success.html.twig');
+        // Check form redirection setting 
+        return $this->redirectAfterSubmission($form);
     }
 
     #[Route('dashboard/forms/delete/{id}', name: 'app_forms_delete')]
@@ -146,10 +150,21 @@ class FormController extends AbstractController {
      * @return array An array containing details, settings, and fields of a form is being returned.
      */
     private function prepareFormForSubmit(string $hashName): array {
-        $form['details'] = $this->entityManager->getRepository(Form::class)->findOneByHashNameAndActive($hashName);
-        $form['settings'] = $this->prepareFormSettings($form['details']->getId());
-        $form['fields'] = $this->prepareFormFields($form['details']->getId());
-        return $form;
+        $form = $this->entityManager->getRepository(Form::class)->findOneByHashNameAndActive($hashName);
+        // Check if the form exists
+        if (!$form) {
+            throw new NotFoundHttpException('Form not authorized or does not exist.');
+        }
+
+        $data['details'] = $form;
+        $data['settings'] = $this->prepareFormSettings($data['details']->getId());
+        // Check if the form expire date has been passed
+        $currentDate = new \DateTime();
+        if (isset($data['settings']['setting_expire_at']) && $currentDate > \DateTime::createFromFormat('Y-m-d', $data['settings']['setting_expire_at'])) {
+            throw new NotFoundHttpException('Form has been expired or not available right now.');
+        }
+        $data['fields'] = $this->prepareFormFields($data['details']->getId());
+        return $data;
     }
 
     /**
@@ -215,5 +230,26 @@ class FormController extends AbstractController {
     private function getFieldOptions(int $fieldId): array {
         $options = $this->entityManager->getRepository(FieldOption::class)->findAllByFieldIdAsArray($fieldId);
         return $options;
+    }
+
+    /**
+     * The function `redirectAfterSubmission` checks for a redirect setting and returns a RedirectResponse
+     * if found, otherwise renders a success template.
+     * 
+     * @param form Based on the code snippet you provided, the `redirectAfterSubmission` function takes a
+     * `` parameter. This function retrieves a redirect option from the database based on the form ID
+     * and a specific key ("setting_redirect_to"). If a redirect option is found, it returns a
+     * `RedirectResponse` to
+     * 
+     * @return Response If the `` is found, a `RedirectResponse` with the URL specified in
+     * the setting value will be returned. Otherwise, it will render the 'forms/success.html.twig'
+     * template.
+     */
+    private function redirectAfterSubmission($form): Response {
+        $redirectOption = $this->entityManager->getRepository(FormSetting::class)->findOneByFormIdAndKey($form->getId(), "setting_redirect_to");
+        if ($redirectOption) {
+            return new RedirectResponse($redirectOption->getSettingValue());
+        }
+        return $this->render('forms/success.html.twig');
     }
 }

@@ -47,16 +47,15 @@ class FormManager implements FormManagerInterface {
      * contains information such as request headers, parameters, and body content. In this context, the
      *  parameter is being used to retrieve data sent from a form submission.
      * 
-     * @return JsonResponse The `createForm` function is returning a JSON response with a success message
-     * indicating that the form creation process was successful. The response contains an array with a key
-     * 'success' set to true. The HTTP status code returned is 200, indicating a successful request.
      */
-    public function createForm(Request $request): JsonResponse {
+    public function createForm(Request $request): Form {
+        $hashName = $this->formService->generateUniqueHashName();
+
         $form = new Form();
         $form->setUserId($this->userId);
         $form->setTitle($request->get('details')['detail_title']);
         $form->setDescription($request->get('details')['detail_description']);
-        $form->setHashName($this->formService->generateUniqueHashName());
+        $form->setHashName($hashName);
         $form->setCreatedAt(now());
         $form->setUpdatedAt(now());
         $form->setStatus(1);
@@ -71,10 +70,24 @@ class FormManager implements FormManagerInterface {
         $fields = $request->get('fields');
         $this->formFieldManager->create($formId, $fields);
 
-        return new JsonResponse(['success' => true], 200);
+        return $form;
     }
 
-    public function updateForm(int $id, Request $request): JsonResponse {
+    /**
+     * The function `updateForm` updates a form entity with the provided ID based on the request data.
+     * 
+     * @param int id The `id` parameter in the `updateForm` function is an integer that represents the
+     * unique identifier of the form that needs to be updated. This identifier is used to retrieve the
+     * specific form from the database for updating its details.
+     * @param Request request The `updateForm` function takes two parameters: an integer `` and a
+     * `Request` object ``. The `` object typically contains data sent by the client in an
+     * HTTP request. In this case, it seems like the `` object is expected to have 'settings'
+     * 
+     * @return Form The `updateForm` function returns an instance of the `Form` entity if a form with the
+     * specified ID and user ID is found and updated successfully. If the form is not found, it returns a
+     * new `JsonResponse` with a message indicating that the update was not successful.
+     */
+    public function updateForm(int $id, Request $request): Form {
         $form = $this->entityManager->getRepository(Form::class)->findOneByIdAndUserId($id, $this->userId);
         if ($form) {
             $this->updateFormRow($form, $request);
@@ -87,7 +100,7 @@ class FormManager implements FormManagerInterface {
             $fields = $request->get('fields');
             $this->formFieldManager->update($formId, $fields);
 
-            return new JsonResponse(['success' => true], 200);
+            return $form;
         }
         return new JsonResponse(['success' => false], 400);
     }
@@ -171,5 +184,4 @@ class FormManager implements FormManagerInterface {
         $this->entityManager->persist($form);
         $this->entityManager->flush();
     }
-
 }
