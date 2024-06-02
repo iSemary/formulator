@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\SessionsRepository;
+use App\Repository\SessionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SessionsRepository::class)]
-class Sessions {
+#[ORM\Entity(repositoryClass: SessionRepository::class)]
+class Session {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -14,6 +14,9 @@ class Sessions {
 
     #[ORM\Column(length: 255)]
     private ?string $ip = null;
+
+    #[ORM\Column]
+    private ?int $formId = null;
 
     #[ORM\Column(length: 255)]
     private ?string $agent = null;
@@ -23,6 +26,16 @@ class Sessions {
 
     public function getId(): ?int {
         return $this->id;
+    }
+
+    public function getFormId(): ?int {
+        return $this->formId;
+    }
+
+    public function setFormId(int $formId): static {
+        $this->formId = $formId;
+
+        return $this;
     }
 
     public function getIp(): ?string {

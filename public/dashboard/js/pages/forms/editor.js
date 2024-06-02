@@ -60,13 +60,19 @@ function getFormDetails(id) {
       let fields = response.form.fields;
 
       fields.forEach((field) => {
+        var options = [];
+        if (field.options && field.options.length > 0) {
+          $.each(field.options, function (index, option) {
+            options.push(option.option_value);
+          });
+        }
         appendElement(
           field.type,
           field.id,
           field.title,
           field.description,
           field.required,
-          field.options ?? []
+          options
         );
       });
     },
@@ -106,10 +112,9 @@ $('.save-form').click(function (e) {
       type: $(this)
         .find('input[name="field[' + fieldID + '][type]"]')
         .val(),
-      required:
-        $(this)
-          .find('input[name="field[' + fieldID + '][required]"]')
-          .val() ?? 0,
+      required: $(this)
+        .find('input[name="field[' + fieldID + '][required]"]')
+        .is(':checked') ? 1 : 0,
       deleted:
         $(this)
           .find('input[name="field[' + fieldID + '][deleted]"]')

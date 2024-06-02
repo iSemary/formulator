@@ -26,14 +26,12 @@ class FieldOptionRepository extends ServiceEntityRepository {
      * @return array
      */
     public function findAllByFieldIdAsArray(int $fieldId): array {
-        $results = $this->createQueryBuilder('fo')
-            ->select('fo.option_value')
+        return  $this->createQueryBuilder('fo')
+            ->select('fo.id, fo.option_value')
             ->where('fo.field_id = :fieldId')
             ->setParameter('fieldId', $fieldId)
             ->andWhere('fo.status = 1')
             ->getQuery()
             ->getArrayResult();
-
-        return array_column($results, 'option_value');
     }
 }

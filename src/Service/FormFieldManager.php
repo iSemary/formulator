@@ -25,7 +25,7 @@ class FormFieldManager implements FormFieldManagerInterface {
             $formField->setDescription($field['description'] ?? "");
             $formField->setType($field['type']);
             $formField->setName("field_" . $key);
-            $formField->setRequired($field['required'] ? 1 : 0);
+            $formField->setRequired($field['required']);
             $formField->setOrderNumber($orderNumber);
             $formField->setStatus(1);
             $formField->setCreatedAt(now());
@@ -33,9 +33,15 @@ class FormFieldManager implements FormFieldManagerInterface {
             $this->entityManager->persist($formField);
             $this->entityManager->flush();
 
+            $fieldId = $formField->getId();
+
+            // Update the name to include the ID
+            $formField->setName("field_" . $fieldId);
+            $this->entityManager->flush();
+
             // Add field options for single options element and multiple options element
             if (in_array($field['type'], [3, 4])) {
-                $this->createFieldOptions($formField->getId(), $field['options']);
+                $this->createFieldOptions($fieldId, $field['options']);
             }
 
             $orderNumber++;
@@ -52,7 +58,7 @@ class FormFieldManager implements FormFieldManagerInterface {
                 if ($existingField) {
                     $existingField->setTitle($field['title']);
                     $existingField->setDescription($field['description'] ?? "");
-                    $existingField->setRequired($field['required'] ? 1 : 0);
+                    $existingField->setRequired($field['required']);
                     $existingField->setOrderNumber($orderNumber);
                     $existingField->setUpdatedAt(now());
                     $this->entityManager->persist($existingField);

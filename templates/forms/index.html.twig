@@ -9,38 +9,63 @@
 	<section class="mt-5">
 		<div class="container">
 			<div class="row justify-content-center">
-				<h5>{{form.details.title}}</h5>
-				<p>{{form.details.description}}</p>
 				<div class="col-md-12 col-lg-12">
-					<form action="" id="baseForm" method="POST">
-						<input
-						type="hidden" name="hash_name" value="{{ form.details.hashName }}"/>
-						{# Form Element Goes Here #}
+					<h5>{{ form.details.title }}</h5>
+					<p>{{ form.details.description }}</p>
+					<form action="{{ path('app_forms_submit', {'hashName': form.details.hashName}) }}" id="baseForm" method="POST" enctype="multipart/form-data">
+						<input type="hidden" name="hash_name" value="{{ form.details.hashName }}"/>
 						{% for field in form.fields %}
 							<div class="form-group mt-3">
-								<label for="field_{{ field.id }}">
-									{{ field.title }}
+								<label class="d-block" for="field_{{ field.id }}">
+									<strong>{{ field.title }}</strong>
 									{% if field.required %}
 										<span class="text-danger">*</span>
 										<small class="text-danger">
-											<i>Required</i></small>
-										{% endif %}
-									</label>
-									{% if field.type == 1 %}
-										<input type="text" id="field_{{ field.id }}" class="form-control" name="field_{{ field.id }}" {% if field.required %} required {% endif %}/>
-									{% elseif field.type == 2 %}
-										<textarea id="field_{{ field.id }}" rows="3" class="form-control" name="field_{{ field.id }}" {% if field.required %} required {% endif %}></textarea>
-										{% else %}
+											<i>Required</i>
+										</small>
 									{% endif %}
-								</div>
-							{% endfor %}
-
-							<div class="form-group mt-3">
-								<button class="btn btn-success" type="submit">Submit</button>
+									{% if field.description %}
+										<p>{{ field.description }}</p>
+									{% endif %}
+								</label>
+								{% if field.type == 1 %}
+									<input type="text" id="field_{{ field.id }}" class="form-control" name="field_{{ field.id }}" {% if field.required %} required {% endif %}/>
+								{% elseif field.type == 2 %}
+									<textarea id="field_{{ field.id }}" rows="3" class="form-control" name="field_{{ field.id }}" {% if field.required %} required {% endif %}></textarea>
+								{% elseif field.type == 3 %}
+									{% for option in field.options %}
+										<div class="form-check">
+											<input class="form-check-input" type="radio" id="option_{{ option.id }}" name="field_{{ field.id }}" value="{{ option.option_value }}" {% if field.required %} required {% endif %}/>
+											<label class="form-check-label" for="option_{{ option.id }}">
+												{{ option.option_value }}
+											</label>
+										</div>
+									{% endfor %}
+								{% elseif field.type == 4 %}
+									{% for option in field.options %}
+										<div class="form-check">
+											<input class="form-check-input" type="checkbox" id="option_{{ option.id }}" name="field_{{ field.id }}[]" value="{{ option.option_value }}"/>
+											<label class="form-check-label" for="option_{{ option.id }}">
+												{{ option.option_value }}
+											</label>
+										</div>
+									{% endfor %}
+								{% elseif field.type == 5 %}
+									<input type="file" id="field_{{ field.id }}" class="form-control-file" name="field_{{ field.id }}" {% if field.required %} required {% endif %}/>
+								{% elseif field.type == 6 %}
+									<input type="date" id="field_{{ field.id }}" class="form-control" name="field_{{ field.id }}" {% if field.required %} required {% endif %}/>
+								{% elseif field.type == 7 %}
+									<input type="time" id="field_{{ field.id }}" class="form-control" name="field_{{ field.id }}" {% if field.required %} required {% endif %}/>
+								{% endif %}
 							</div>
-						</form>
-					</div>
+						{% endfor %}
+
+						<div class="form-group mt-3">
+							<button class="btn btn-success" type="submit">Submit</button>
+						</div>
+					</form>
 				</div>
 			</div>
-		</section>
-	{% endblock %}
+		</div>
+	</section>
+{% endblock %}

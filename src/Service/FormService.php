@@ -18,7 +18,7 @@ class FormService {
     ) {
         $this->security = $security;
         $this->entityManager = $entityManager;
-        $this->userId = $this->security->getUser()->getUserIdentifier();
+        $this->userId = $this->security->getUser() ? $this->security->getUser()->getUserIdentifier() : null;
     }
 
     /**

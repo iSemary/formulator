@@ -8,6 +8,7 @@ use App\Entity\FormElement;
 use App\Entity\FormField;
 use App\Entity\FormSetting;
 use App\Service\FormManager;
+use App\Service\FormSubmission;
 use Doctrine\ORM\EntityManagerInterface;
 use Omines\DataTablesBundle\DataTableFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,14 +24,16 @@ class FormController extends AbstractController {
     private $security;
     private $formElements;
     private $formManager;
+    private $formSubmission;
     private $userId;
 
-    public function __construct(EntityManagerInterface $entityManager, Security $security, FormManager $formManager) {
+    public function __construct(EntityManagerInterface $entityManager, Security $security, FormManager $formManager, FormSubmission $formSubmission) {
         $this->entityManager = $entityManager;
         $this->security = $security;
         $this->formManager = $formManager;
+        $this->formSubmission = $formSubmission;
         $this->formElements = $this->entityManager->getRepository(FormElement::class)->findAll();
-        $this->userId = $this->security->getUser()->getUserIdentifier();
+        $this->userId = $this->security->getUser() ? $this->security->getUser()->getUserIdentifier() : null;
     }
 
     #[Route('dashboard/forms', name: 'app_forms')]
@@ -93,6 +96,18 @@ class FormController extends AbstractController {
     public function show($hashName) {
         $form = $this->prepareFormForSubmit($hashName);
         return $this->render('forms/index.html.twig', ['form' => $form]);
+    }
+
+    #[Route('/forms/{hashName}/submit', name: 'app_forms_submit', methods: ['POST'])]
+    public function submit(Request $request, $hashName): Response {
+        $form = $this->entityManager->getRepository(Form::class)->findOneByHashNameAndActive($hashName);
+        if (!$form) {
+            throw new NotFoundHttpException('Form not authorized or does not exist.');
+        }
+
+        $result = $this->formSubmission->submit($hashName, $request);
+
+        return $this->render('forms/success.html.twig');
     }
 
     #[Route('dashboard/forms/delete/{id}', name: 'app_forms_delete')]
@@ -187,6 +202,16 @@ class FormController extends AbstractController {
         return $formattedSettings;
     }
 
+    /**
+     * This PHP function retrieves field options from the database based on a given field ID.
+     * 
+     * @param int fieldId Thank you for providing the code snippet. It seems like you are trying to
+     * retrieve field options based on a given field ID. If you have any specific field ID in mind, please
+     * provide me with the value of the `fieldId` parameter so that I can assist you further in
+     * understanding how the `
+     * 
+     * @return array An array of field options associated with the given field ID is being returned.
+     */
     private function getFieldOptions(int $fieldId): array {
         $options = $this->entityManager->getRepository(FieldOption::class)->findAllByFieldIdAsArray($fieldId);
         return $options;

@@ -23,7 +23,7 @@ class LoginFormType extends AbstractType {
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Login',
-                'attr' => ['class' => "btn btn-primary"]
+                'attr' => ['class' => "btn btn-primary mt-2"]
             ]);
     }
 

@@ -36,7 +36,7 @@ class FormManager implements FormManagerInterface {
         $this->formSettingManager = $formSettingManager;
         $this->formFieldManager = $formFieldManager;
         $this->formService = $formService;
-        $this->userId = $this->security->getUser()->getUserIdentifier();
+        $this->userId = $this->security->getUser() ? $this->security->getUser()->getUserIdentifier() : null;
     }
 
     /**
