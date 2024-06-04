@@ -45,5 +45,20 @@
 				</div>
 			</div>
 		</div>
+		<div class="card">
+			<div class="card-header">
+				Chart Title
+			</div>
+			<div class="card-body">
+				<div style="width: 100%; margin: auto;">
+					<canvas id="formsChart"></canvas>
+				</div>
+			</div>
+		</div>
 	</section>
+{% endblock %}
+
+{% block scripts %}
+	<script src="{{ asset('dashboard/plugins/chartjs/chartjs.min.js') }}"></script>
+	<script src="{{ asset('dashboard/js/pages/index.js') }}"></script>
 {% endblock %}

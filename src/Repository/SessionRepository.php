@@ -32,6 +32,17 @@ class SessionRepository extends ServiceEntityRepository {
             ->getSingleScalarResult();
     }
 
+    public function getTotalFormSessions($userId) {
+        return $this->createQueryBuilder('s')
+            ->select('f.title AS form_title, COUNT(s.id) AS session_count')
+            ->join('App\Entity\Form', 'f', 'WITH', 's.formId = f.id')
+            ->where('f.userId = :userId')
+            ->setParameter('userId', $userId)
+            ->groupBy('f.title')
+            ->getQuery()
+            ->getResult();
+    }    
+
     public function findOneByIdAndUserId(int $sessionId, int $userId) {
         return $this->createQueryBuilder('s')
             ->select('s.id', 's.formId', 's.ip', 's.agent', 's.created_at')

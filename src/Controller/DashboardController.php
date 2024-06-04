@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Service\FormService;
 use App\Service\SessionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -27,5 +28,11 @@ class DashboardController extends AbstractController {
             'totalSessions' => $totalSessions,
             'leads' => 'DashboardController',
         ]);
+    }
+
+    #[Route('/dashboard/form/results', name: 'app_dashboard_form_results')]
+    public function formResults(): Response {
+        $results = $this->sessionService->getTotalFormSessions();
+        return new JsonResponse(["status" => 200, 'results' => $results], 200);
     }
 }

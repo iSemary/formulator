@@ -22,7 +22,10 @@ class SessionService {
 
 
     public function getTotalSessions(): int {
-        $sessionRepository = $this->entityManager->getRepository(Session::class);
-        return $sessionRepository->getTotalSessions($this->userId);
+        return $this->entityManager->getRepository(Session::class)->getTotalSessions($this->userId);
+    }
+
+    public function getTotalFormSessions(): array {
+        return $this->entityManager->getRepository(Session::class)->getTotalFormSessions($this->userId);
     }
 }
