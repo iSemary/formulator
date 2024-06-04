@@ -23,16 +23,15 @@ Formulator is a self-serve form builder application built from scratch using PHP
 
 ## Technologies Used
 
-- **Backend**: PHP, Symfony Framework, MySQL
-- **Frontend**: JavaScript, jQuery, HTML, CSS
-- **Charts and Graphs**: JavaScript libraries (e.g., Chart.js)
+- **Backend**: PHP, Symfony, MySQL
+- **Frontend**: Bootstrap, DataTables, ChartJS, JavaScript, jQuery, HTML, CSS
 
 ## Installation
 
 1.  **Clone the repository**:
 
     ```bash
-    git clone <https://github.com/yourusername/formulator.git>
+    git clone <https://github.com/isemary/formulator.git>
 
     ```
 
@@ -47,8 +46,6 @@ Formulator is a self-serve form builder application built from scratch using PHP
 
     ```bash
     composer install
-    npm install
-
     ```
 
 4.  **Set up environment variables**:
