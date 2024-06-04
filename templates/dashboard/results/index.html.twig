@@ -1,0 +1,46 @@
+{% extends './dashboard/base.html.twig' %}
+
+{% block title %}
+	Your Results
+{% endblock %}
+
+{% block body %}
+	<div class="card">
+		<div class="card-header">
+			<div class="row">
+				<div class="col-md-8">
+					Results
+				</div>
+			</div>
+		</div>
+		<div class="card-body">
+			<div class="table"></div>
+		</div>
+	</div>
+	<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="detailsModalLabel">Session Details</h5>
+					<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body" id="modalContent"></div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+	<script src="{{ asset('dashboard/plugins/datatables/datatables.min.js') }}"></script>
+	<script src="{{ asset('bundles/datatables/js/datatables.js') }}"></script>
+	<script src="{{ asset('dashboard/js/pages/results/index.js') }}"></script>
+	<script>
+		$(function () {
+$('.table').initDataTables({{ datatable_settings(datatable) }});
+});
+	</script>
+{% endblock %}

@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app.file_path: "%kernel.project_dir%/var/uploads/forms"
+    app.url_path: "/dashboard/uploads/forms"
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -31,6 +32,7 @@ services:
     App\Service\FormSubmission:
         arguments:
             $filePath: "%app.file_path%"
+            $urlPath: "%app.url_path%"
         autowire: true
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

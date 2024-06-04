@@ -13,11 +13,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FormSubmission {
     private $entityManager;
-    private $filePath;
+    public $filePath;
+    public $urlPath;
 
-    public function __construct(EntityManagerInterface $entityManager, string $filePath) {
+    public function __construct(EntityManagerInterface $entityManager, string $filePath, string $urlPath) {
         $this->entityManager = $entityManager;
         $this->filePath = $filePath;
+        $this->urlPath = $urlPath;
     }
 
     public function submit(string $hashName, Request $request) {

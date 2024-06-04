@@ -14,35 +14,33 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Sessions[]    findAll()
  * @method Sessions[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SessionRepository extends ServiceEntityRepository
-{
-    public function __construct(ManagerRegistry $registry)
-    {
+class SessionRepository extends ServiceEntityRepository {
+    public function __construct(ManagerRegistry $registry) {
         parent::__construct($registry, Session::class);
     }
 
-//    /**
-//     * @return Sessions[] Returns an array of Sessions objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('s.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * @return int Returns numeric number of total forms for specific user
+     */
+    public function getTotalSessions(int $userId): int {
+        return $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->join('App\Entity\Form', 'f', 'WITH', 's.formId = f.id')
+            ->andWhere('f.userId = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
-//    public function findOneBySomeField($value): ?Sessions
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function findOneByIdAndUserId(int $sessionId, int $userId) {
+        return $this->createQueryBuilder('s')
+            ->select('s.id', 's.formId', 's.ip', 's.agent', 's.created_at')
+            ->join('App\Entity\Form', 'f', 'WITH', 's.formId = f.id')
+            ->where('f.userId = :userId')
+            ->andWhere('s.id = :id')
+            ->setParameter('userId', $userId)
+            ->setParameter('id', $sessionId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

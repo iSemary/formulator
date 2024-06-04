@@ -156,7 +156,8 @@ class FormManager implements FormManagerInterface {
             }])
             ->add('created_at', DateTimeColumn::class, ['label' => "Created At"])
             ->add('actions', TextColumn::class, ['label' => "Actions", 'render' => function ($value, $row) {
-                $buttons = sprintf('<a href="/dashboard/forms/edit/%u" class="btn btn-sm btn-primary me-1">Edit</a>', $row->getId());
+                $buttons = sprintf('<a href="/dashboard/results?form_id=%u" class="btn btn-sm btn-info me-1">Results</a>', $row->getId());
+                $buttons .= sprintf('<a href="/dashboard/forms/edit/%u" class="btn btn-sm btn-primary me-1">Edit</a>', $row->getId());
                 $buttons .= sprintf('<button data-id="%u" class="btn btn-sm btn-' . ($row->getStatus() == 1 ? "danger delete-form" : "warning restore-form") . '" type="button">' . ($row->getStatus() == 1 ? "Delete" : "Restore") . '</button>', $row->getId());
                 return $buttons;
             }])
