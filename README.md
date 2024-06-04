@@ -50,11 +50,12 @@ Formulator is a self-serve form builder application built from scratch using PHP
 
 4.  **Set up environment variables**:
     Copy the `.env` file and configure your database settings and other environment variables.
+    
         ```bash
         cp .env.example .env
 
         ```
-5.  **Set up the database**:
+6.  **Set up the database**:
 
     ```bash
     php bin/console doctrine:database:create
@@ -62,13 +63,13 @@ Formulator is a self-serve form builder application built from scratch using PHP
 
     ```
 
-6.  **Convert SCSS to CSS**:
+7.  **Convert SCSS to CSS**:
 
     ```bash
     sass --watch public/dashboard/css/main.scss:public/dashboard/css/main.css
     ```
 
-7.  **Start the Symfony server**:
+8.  **Start the Symfony server**:
 
     ```bash
     symfony server:start
