@@ -4,6 +4,11 @@
 
 Formulator is a self-serve form builder application built from scratch using PHP, MySQL, Symfony, JavaScript, and jQuery. The application allows users to create, manage, and analyze forms with ease. Formulator features include user authentication, a comprehensive dashboard, and a versatile form builder that supports various input types and advanced settings.
 
+## Figma Snapshots
+
+For a visual preview of the project, check out my Figma designs:
+[Open With Figma](https://www.figma.com/design/BqHwf9GE6ZaOB0GNcn7X8B/Formulator)
+
 ## Features
 
 - **User Authentication**: Secure login and registration system.
