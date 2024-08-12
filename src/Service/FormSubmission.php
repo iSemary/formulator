@@ -48,7 +48,7 @@ class FormSubmission {
                 } else {
                     $this->saveResult($formId, $sessionId, $formField->getId(), $fieldValue);
                 }
-            } elseif ($request->files->has($fieldName)) {
+            } elseif ($request->files->has($fieldName) && $request->files->get($fieldName) != null) {
                 $fileName = $this->uploadFile($request->files->get($fieldName));
                 $this->saveResult($formId, $sessionId, $formField->getId(), $fileName);
             } else {
